@@ -4,6 +4,7 @@ import dev.rgoussu.hexabank.business.model.types.Currency;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,4 +28,18 @@ public class MoneyTest {
         assertThrows(IllegalArgumentException.class, ()-> money.plus(toAdd));
     }
 
+    @Test
+    public void givenCurrencyAndExchangeRateShouldProperlyConvert(){
+        Money money = Money.get(100, Currency.EUR);
+        Money expected = Money.get(88, Currency.USD);
+        Money actual = money.convert(Currency.USD, 0.88);
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0,-10.0})
+    public void givenCurrencyAndInvalidExchangeRateShouldThrow(double exchangeRate){
+        Money money = Money.get(100, Currency.EUR);
+        assertThrows(IllegalArgumentException.class, ()-> money.convert(Currency.USD, exchangeRate));
+    }
 }

@@ -5,13 +5,12 @@ import dev.rgoussu.hexabank.business.model.values.Money;
 import lombok.*;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
 @ToString
 public class Account {
-    private String accountId;
-    private Money balance;
+    private final String accountId;
+    private final Money balance;
 
     /**
      * Create an account with a balance of 0 €
@@ -67,5 +66,9 @@ public class Account {
             throw new IllegalArgumentException("Can not deposit negative amount of money");
         }
         return create(accountId, balance.plus(amount));
+    }
+
+    public Currency getOperatingCurrency() {
+        return balance.getCurrency();
     }
 }
