@@ -26,4 +26,5 @@ public class MoneyTest {
         Money toAdd = Money.get(10, Currency.USD);
         assertThrows(IllegalArgumentException.class, ()-> money.plus(toAdd));
     }
+
 }

@@ -17,6 +17,12 @@ public class Money {
     }
 
     public Money plus(Money other){
+        if(!other.currency.equals(currency)){
+            throw new IllegalArgumentException("Can not add money in different currencies : "
+                    + this.currency
+                    + " to "
+                    + other.currency);
+        }
         return Money.get(other.amount.add(this.amount), currency);
     }
 
