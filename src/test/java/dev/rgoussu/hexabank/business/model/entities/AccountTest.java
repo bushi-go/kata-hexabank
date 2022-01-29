@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AccountTest {
 
@@ -26,6 +27,13 @@ public class AccountTest {
         Account expected = Account.builder().accountId(accountId).balance(initialBalance.plus(amount)).build();
         Account actual = underTest.deposit(amount);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void givenNegativeMoneyShouldThrow(){
+        String accountId = UUID.randomUUID().toString();
+        Account underTest = Account.builder().accountId(accountId).balance(Money.get(0, Currency.EUR)).build();
+        assertThrows(IllegalArgumentException.class, ()->underTest.deposit(Money.get(-10, Currency.EUR)));
     }
 
     public static Stream<Arguments> generateDeposits() {
