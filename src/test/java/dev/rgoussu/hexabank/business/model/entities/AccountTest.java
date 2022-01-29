@@ -11,8 +11,8 @@ public class AccountTest {
     @Test
     public void givenAccountAndDepositShouldAddToBalance(){
         String accountId = UUID.randomUUID().toString();
-        Account underTest = Account.builder().id(accountId).build();
-        Account expected = Account.builder().id(accountId).balance(10).build();
+        Account underTest = Account.builder().accountId(accountId).build();
+        Account expected = Account.builder().accountId(accountId).balance(10).build();
         Account actual = underTest.deposit(10);
         assertEquals(expected, actual);
     }
