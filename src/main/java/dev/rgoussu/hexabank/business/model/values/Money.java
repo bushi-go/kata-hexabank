@@ -8,9 +8,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Getter
 public class Money {
-    public BigDecimal amount;
-    public Currency currency;
+    private BigDecimal amount;
+    private Currency currency;
 
     public static Money get(Number amount, Currency currency){
         return new Money(BigDecimal.valueOf(amount.doubleValue()), currency);
