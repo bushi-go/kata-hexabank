@@ -60,7 +60,7 @@ public class AccountOperationServicesTest {
         Account targetAccount = Account.create(accountId, 5000);
         Mockito.when(persistencePort.findByAccountId(accountId)).thenReturn(targetAccount);
         Money deposit = Money.get(amount, currency);
-        Money expectedValue = deposit.convert(targetAccountadd.getOperatingCurrency(), exchangeRate).plus(targetAccount.getBalance());
+        Money expectedValue = deposit.convert(targetAccount.getOperatingCurrency(), exchangeRate).plus(targetAccount.getBalance());
         DepositResult expected = DepositResult.success(accountId,expectedValue);
         DepositResult actual = underTest.processDeposit(accountId, deposit);
     }
