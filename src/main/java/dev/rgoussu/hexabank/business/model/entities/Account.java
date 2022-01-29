@@ -13,6 +13,6 @@ public class Account {
     private int balance;
 
     public Account deposit(int amount){
-        return this.toBuilder().balance(amount).build();
+        return this.toBuilder().balance(this.balance+amount).build();
     }
 }
