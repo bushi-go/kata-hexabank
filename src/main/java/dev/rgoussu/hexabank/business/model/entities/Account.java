@@ -32,13 +32,22 @@ public class Account {
     }
 
     /**
+     * Create an account with a balance of 0 €
+     * @param accountId the unique Id of the account
+     * @return the new Account
+     */
+    public static Account create(String accountId, long balance){
+        return create(accountId, Currency.EUR, balance);
+    }
+
+    /**
      * Create an account with the given initial balance, operation with the given currency
      * @param accountId the unique Id of the account
      * @param currency the Currency of operation of the account
      * @param initialBalance the initial balance of the account
      * @return the new Account
      */
-    public static Account create(String accountId, Currency currency, int initialBalance){
+    public static Account create(String accountId, Currency currency, long initialBalance){
         return new Account(accountId, Money.get(initialBalance, currency));
     }
 
