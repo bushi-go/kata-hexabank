@@ -1,5 +1,6 @@
 package dev.rgoussu.hexabank.business.services;
 
+import dev.rgoussu.hexabank.business.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.business.model.dto.DepositResult;
 import dev.rgoussu.hexabank.business.model.entities.Account;
 import dev.rgoussu.hexabank.business.model.types.Currency;
@@ -8,11 +9,15 @@ import dev.rgoussu.hexabank.business.ports.driven.AccountPersistencePort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,4 +42,13 @@ public class AccountOperationServicesTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void givenNonExistingAccountShouldReturnFailure(){
+        String accountId = UUID.randomUUID().toString();
+        Mockito.when(persistencePort.findByAccountId(accountId)).thenThrow(new NoSuchAccountException("No account with id " + accountId));
+        Money deposit = Money.get(30, Currency.EUR);
+        DepositResult expected = DepositResult.noSuchAccount(accountId);
+        DepositResult actual = underTest.processDeposit(accountId, deposit);
+        assertEquals(expected, actual);
+    }
 }
