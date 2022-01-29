@@ -20,7 +20,9 @@ public class AccountOperationManager implements AccountOperationService{
     @Override
     public DepositResult processDeposit(String accountId, Money deposit) {
         try {
-            Account account = accountPersistencePort.findByAccountId(accountId).deposit(deposit);
+            Account account = accountPersistencePort
+                    .findByAccountId(accountId)
+                    .deposit(deposit);
             accountPersistencePort.save(account);
             return DepositResult.success(accountId, account.getBalance());
         }catch(NoSuchAccountException e){

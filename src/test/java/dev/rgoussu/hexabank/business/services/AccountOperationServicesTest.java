@@ -4,6 +4,7 @@ import dev.rgoussu.hexabank.business.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.business.model.dto.DepositResult;
 import dev.rgoussu.hexabank.business.model.entities.Account;
 import dev.rgoussu.hexabank.business.model.types.Currency;
+import dev.rgoussu.hexabank.business.model.types.DepositStatus;
 import dev.rgoussu.hexabank.business.model.values.Money;
 import dev.rgoussu.hexabank.business.ports.driven.AccountPersistencePort;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,5 +51,22 @@ public class AccountOperationServicesTest {
         DepositResult expected = DepositResult.noSuchAccount(accountId);
         DepositResult actual = underTest.processDeposit(accountId, deposit);
         assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @MethodSource("generateDepositInDifferentCurrency")
+    public void givenDepositInAnotherCurrencyShouldConvertAndProceedToDepositSuccessfully(double amount, double exchangeRate, Currency currency){
+        String accountId = UUID.randomUUID().toString();
+        Account targetAccount = Account.create(accountId, 5000);
+        Mockito.when(persistencePort.findByAccountId(accountId)).thenReturn(targetAccount);
+        Money deposit = Money.get(amount, currency);
+        Money expectedValue = deposit.convert(targetAccountadd.getOperatingCurrency(), exchangeRate).plus(targetAccount.getBalance());
+        DepositResult expected = DepositResult.success(accountId,expectedValue);
+        DepositResult actual = underTest.processDeposit(accountId, deposit);
+    }
+
+
+    public static Stream<Arguments> generateDepositInDifferentCurrency() {
+        return Stream.of(Arguments.of(100.0, 0.88, Currency.USD), Arguments.of(50.0, Currency.GBP), Arguments.of(50000, Currency.JPY));
     }
 }
