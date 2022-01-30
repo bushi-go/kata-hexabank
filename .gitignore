@@ -1,2 +1,8 @@
 .idea/
 target/
+**/*.iml
+**/.vscode/
+**/target/
+google_checks.xml
+**/.settings/
+**/.project

@@ -4,18 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.rgoussu</groupId>
+    <groupId>dev.rgoussu.kata-hexabank</groupId>
     <artifactId>kata-hexabank</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>core</module>
+        <module>cli</module>
+        <module>rest</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.22</lombok.version>
         <junit.version>5.8.2</junit.version>
         <mockito.version>4.3.1</mockito.version>
+        <slf4j.version>1.7.33</slf4j.version>
+        <maven-checkstyle.version>3.1.2</maven-checkstyle.version>
+        <checkstyle.version>9.2.1</checkstyle.version>
     </properties>
     <dependencies>
+        <!-- SLF4J/Logging. Up to module to define their own backend of choice -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -27,15 +45,38 @@
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
         </dependency>
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Checkstyle -->
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven-checkstyle.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -50,6 +91,26 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle.version}</version>
+                <configuration>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <configLocation>google_checks.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
