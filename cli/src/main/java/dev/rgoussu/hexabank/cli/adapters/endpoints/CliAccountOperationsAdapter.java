@@ -1,4 +1,4 @@
-package dev.rgoussu.hexabank.cli.adapters;
+package dev.rgoussu.hexabank.cli.adapters.endpoints;
 
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
