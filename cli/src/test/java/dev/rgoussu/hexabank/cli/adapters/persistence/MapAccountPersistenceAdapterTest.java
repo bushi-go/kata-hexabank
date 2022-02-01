@@ -25,7 +25,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(classes = {
     MapAccountPersistenceAdapter.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @EnableConfigurationProperties(AccountCsvStoreConfig.class)
-
 public class MapAccountPersistenceAdapterTest {
 
   @Autowired
