@@ -42,6 +42,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
     this.config = config;
     // There is very little likelihood that this class will ever be used in a concurrent context, so a simple hashMap should be enough
     accountMap = new HashMap<>();
+
   }
 
   /**
