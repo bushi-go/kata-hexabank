@@ -1,7 +1,6 @@
-package dev.rgoussu.hexabank.cli.operations;
+package dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations;
 
 import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
-import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;

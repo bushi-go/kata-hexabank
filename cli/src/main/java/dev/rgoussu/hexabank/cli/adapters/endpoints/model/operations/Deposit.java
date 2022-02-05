@@ -1,5 +1,6 @@
-package dev.rgoussu.hexabank.cli.operations;
+package dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations;
 
+import dev.rgoussu.hexabank.cli.adapters.endpoints.AccountValidator;
 import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
 import dev.rgoussu.hexabank.core.model.types.Currency;
 import dev.rgoussu.hexabank.core.model.values.Money;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Component;
 public class Deposit extends BankOperation {
     private static final String CONFIRM_CODE = "Y";
 
-    public Deposit(AccountOperationsPort<String> service, CliDisplay display) {
-        super(service, display, 1, "Deposit");
+    public Deposit(AccountOperationsPort<String> service, AccountValidator validator, CliDisplay display) {
+        super(service,validator, display, 1, "Deposit");
     }
 
     @Override
