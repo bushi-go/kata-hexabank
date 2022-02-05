@@ -8,3 +8,4 @@ google_checks.xml
 **/.project
 ### Local config ###
 **/.env
+/logs/

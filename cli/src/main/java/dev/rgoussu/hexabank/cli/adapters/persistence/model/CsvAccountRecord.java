@@ -54,7 +54,7 @@ public record CsvAccountRecord(String accountId, Money balance) {
    */
   public String toCsv(String delimiter, String headerLine) {
 
-    return Stream.of(headerLine.split(delimiter)).map(header -> {
+    return Stream.of(headerLine.split("["+delimiter+"]")).map(header -> {
       if (ID_HEADER.equals(header)) {
         return accountId;
       } else if (CURRENCY_HEADER.equals(header)) {
@@ -77,11 +77,11 @@ public record CsvAccountRecord(String accountId, Money balance) {
    */
   public static CsvAccountRecord fromCsv(String csvLine, String delimiter,
                                          String headerLine) throws IllegalArgumentException {
-    List<String> headers = Stream.of(headerLine.split(delimiter)).collect(Collectors.toList());
+    List<String> headers = Stream.of(headerLine.split("[" + delimiter+"]")).toList();
     if (Stream.of(HEADERS).anyMatch(header -> !headers.contains(header))) {
       throw new IllegalArgumentException("Missing headers on csv "+headers);
     }
-    String[] parts = csvLine.split(delimiter);
+    String[] parts = csvLine.split("["+delimiter+"]");
     if (parts.length != headers.size()) {
       throw new IllegalArgumentException("Malformed csv line - could not read account data");
     }
