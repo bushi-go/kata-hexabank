@@ -38,8 +38,13 @@ public class CliAccountOperationsAdapter implements AccountOperationsPort<String
             result.getError());
         message = "Failed to process deposit :"+result.getError();
       }
-      default -> message = "Deposit is a " + result.getStatus() + result.getError()!= null ? " error : " + result.getError() : "";
+      default -> message = "Deposit is a " + result.getStatus() + (result.getError()!= null ? " error : " + result.getError() : "");
     }
     return message;
+  }
+
+  @Override
+  public boolean isValidAccount(String account) {
+    return accountOperationService.checkAccount(account);
   }
 }
