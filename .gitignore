@@ -6,3 +6,5 @@ target/
 google_checks.xml
 **/.settings/
 **/.project
+### Local config ###
+**/.env

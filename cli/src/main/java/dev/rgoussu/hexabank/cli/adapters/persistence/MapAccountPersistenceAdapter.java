@@ -40,6 +40,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
   MapAccountPersistenceAdapter(AccountCsvStoreConfig config) {
 
     this.config = config;
+    LOGGER.debug(config.getDelimiter());
     // There is very little likelihood that this class will ever be used in a concurrent context, so a simple hashMap should be enough
     accountMap = new HashMap<>();
 
@@ -54,7 +55,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
     try (Stream<String> stream = Files.lines(accountFile.toPath())) {
       // We collect the stream here to check for the header line
       accountMap.putAll(mapCsvToAccountRecord(stream));
-      LOGGER.info("Initialized {} accounts data from csv store", accountMap.size());
+      LOGGER.info("Initialized {} accounts data from csv store located at {}", accountMap.size(), accountFile.getPath());
     } catch (FileNotFoundException e) {
       LOGGER.warn(
           "Could not find account csv backing file, assuming none exists yet and trying to create one");
