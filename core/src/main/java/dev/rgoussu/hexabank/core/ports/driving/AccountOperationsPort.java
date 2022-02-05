@@ -18,10 +18,4 @@ public interface AccountOperationsPort<T> {
    */
   T deposit(String accountId, Money deposit);
 
-  /**
-   * Check if a given account number is valid
-   * @param account account number
-   * @return true if valid
-   */
-    boolean isValidAccount(String account);
 }

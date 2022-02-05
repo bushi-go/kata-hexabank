@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * CLI based account operation adapter.
  */
 @Component
-public class CliAccountOperationsAdapter implements AccountOperationsPort<String> {
+public class CliAccountOperationsAdapter implements AccountOperationsPort<String>, AccountValidator {
 
   private final Logger LOGGER = LoggerFactory.getLogger("AccountOperationEndPoint");
   private final AccountOperationService accountOperationService;

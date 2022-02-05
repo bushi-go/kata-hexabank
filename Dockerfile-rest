@@ -1,0 +1,20 @@
+FROM maven:3-eclipse-temurin-17-alpine as build
+WORKDIR /opt/hexa
+COPY settings/settings.xml ./settings.xml
+COPY ./pom.xml pom.xml
+COPY ./core/pom.xml ./core/pom.xml
+COPY ./cli/pom.xml ./cli/pom.xml
+COPY ./rest/pom.xml ./rest/pom.xml
+RUN mvn -s ./settings.xml dependency:go-offline
+
+COPY ./core/src ./core/src/
+COPY ./rest/src ./rest/src/
+RUN mvn package -pl core,rest -Ddebug=true -DskipTests
+
+FROM eclipse-temurin:17_35-jdk-alpine
+WORKDIR /app
+COPY --from=build /opt/hexa/rest/target/*.jar app.jar
+
+ENTRYPOINT java -jar app.jar
+
+EXPOSE 8080

@@ -1,6 +1,6 @@
-package dev.rgoussu.hexabank.cli.operations.config;
+package dev.rgoussu.hexabank.cli.adapters.endpoints.config;
 
-import dev.rgoussu.hexabank.cli.operations.BankOperation;
+import dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations.BankOperation;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
