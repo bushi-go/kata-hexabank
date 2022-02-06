@@ -77,9 +77,13 @@ public class AccountTest {
     Account actual = underTest.withdraw(amount);
     assertEquals(expected, actual);
   }
-
   @Test
-  public void givenWithdrawalInAnotherCurrencyShouldThrow(){
-    String account = UUID.randomUUID().toString();
+  public void givenUninitializedBalanceShouldInitializeAndProcessWithdrawal() {
+    String accountId = UUID.randomUUID().toString();
+    Account underTest = Account.create(accountId);
+    Money withdrawal = Money.get(10, Currency.EUR);
+    Account expected = Account.create(accountId, withdrawal.negate());
+    Account actual = underTest.withdraw(withdrawal);
+    assertEquals(expected, actual);
   }
 }

@@ -11,6 +11,11 @@ import lombok.ToString;
 /**
  * Class representing a bank account and its operations.
  * Immutable and use a fluent api.
+ * Works only with positive amount for the deposit and withdrawal :
+ * - for deposit, if a negative amount is passed, an exception is thrown
+ * because one can not add negative money
+ * - for withdrawal, if a negative amount is passed, it is accepted,
+ * and is negated before passing to the Money.minus method
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -97,7 +102,10 @@ public class Account {
     return balance.getCurrency();
   }
 
-  public Account withdraw(Money withdrawal) {
-    return create(accountId, getOperatingCurrency(), balance.getAmount().subtract(withdrawal.getAmount()).longValue());
+  public Account withdraw(Money amount) {
+    if (amount.getAmount().signum() < 0) {
+      amount = amount.negate();
+    }
+    return create(accountId, balance.minus(amount));
   }
 }

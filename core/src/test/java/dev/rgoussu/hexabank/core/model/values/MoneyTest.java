@@ -22,7 +22,7 @@ public class MoneyTest {
   }
 
   @Test
-  public void givenTwoMoneyInDifferentCurrencyShouldThrow() {
+  public void givenTwoMoneyToAddInDifferentCurrencyShouldThrow() {
     Money money = Money.get(10, Currency.EUR);
     Money toAdd = Money.get(10, Currency.USD);
     assertThrows(IllegalArgumentException.class, () -> money.plus(toAdd));
@@ -51,9 +51,14 @@ public class MoneyTest {
   public void givenTwoCurrenciesShouldSubstract(double amount, double substract){
     Money money = Money.get(amount, Currency.EUR);
     Money sub = Money.get(substract, Currency.EUR);
-    Money actual = money.minus(substract);
+    Money actual = money.minus(sub);
     Money expected = Money.get(amount-substract, Currency.EUR);
     assertEquals(actual,expected);
-
+  }
+  @Test
+  public void givenTwoMoneyToSubstractInDifferentCurrencyShouldThrow() {
+    Money money = Money.get(10, Currency.EUR);
+    Money toAdd = Money.get(10, Currency.USD);
+    assertThrows(IllegalArgumentException.class, () -> money.minus(toAdd));
   }
 }
