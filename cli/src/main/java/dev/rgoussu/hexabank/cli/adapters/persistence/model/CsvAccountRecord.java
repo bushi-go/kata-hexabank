@@ -37,8 +37,8 @@ public record CsvAccountRecord(String accountId, Money balance) {
    * @return true if the line is a header line, false otherwise
    */
   public static boolean isHeaderLine(String line) {
-    return line.contains(ID_HEADER) && line.contains(BALANCE_HEADER) &&
-        line.contains(CURRENCY_HEADER);
+    return line.contains(ID_HEADER) && line.contains(BALANCE_HEADER)
+        && line.contains(CURRENCY_HEADER);
   }
 
   public static String getDefaultDelimiter() {
@@ -46,28 +46,8 @@ public record CsvAccountRecord(String accountId, Money balance) {
   }
 
   /**
-   * Write the record to a csv string representation with the given delimiter and following the order dictated by the header line.
-   *
-   * @param delimiter  delimiter to use between field
-   * @param headerLine header line of the target csv format
-   * @return CSV String representation of the account;
-   */
-  public String toCsv(String delimiter, String headerLine) {
-
-    return Stream.of(headerLine.split("["+delimiter+"]")).map(header -> {
-      if (ID_HEADER.equals(header)) {
-        return accountId;
-      } else if (CURRENCY_HEADER.equals(header)) {
-        return balance.getCurrency().name();
-      } else {
-        return balance.getAmount().toString();
-      }
-    }).collect(Collectors.joining(delimiter));
-  }
-
-
-  /**
-   * Read an Account record from a csv line, with the given delimiter and in the order dictated by the header line.
+   * Read an Account record from a csv line, with the given delimiter and in the order dictated
+   * by the header line.
    *
    * @param csvLine    the line to be read
    * @param delimiter  the delimiter used
@@ -77,11 +57,11 @@ public record CsvAccountRecord(String accountId, Money balance) {
    */
   public static CsvAccountRecord fromCsv(String csvLine, String delimiter,
                                          String headerLine) throws IllegalArgumentException {
-    List<String> headers = Stream.of(headerLine.split("[" + delimiter+"]")).toList();
+    List<String> headers = Stream.of(headerLine.split("[" + delimiter + "]")).toList();
     if (Stream.of(HEADERS).anyMatch(header -> !headers.contains(header))) {
-      throw new IllegalArgumentException("Missing headers on csv "+headers);
+      throw new IllegalArgumentException("Missing headers on csv " + headers);
     }
-    String[] parts = csvLine.split("["+delimiter+"]");
+    String[] parts = csvLine.split("[" + delimiter + "]");
     if (parts.length != headers.size()) {
       throw new IllegalArgumentException("Malformed csv line - could not read account data");
     }
@@ -103,6 +83,27 @@ public record CsvAccountRecord(String accountId, Money balance) {
    */
   public static CsvAccountRecord fromAccount(Account account) {
     return new CsvAccountRecord(account.getAccountId(), account.getBalance());
+  }
+
+  /**
+   * Write the record to a csv string representation with the given delimiter and following
+   * the order dictated by the header line.
+   *
+   * @param delimiter  delimiter to use between field
+   * @param headerLine header line of the target csv format
+   * @return CSV String representation of the account;
+   */
+  public String toCsv(String delimiter, String headerLine) {
+
+    return Stream.of(headerLine.split("[" + delimiter + "]")).map(header -> {
+      if (ID_HEADER.equals(header)) {
+        return accountId;
+      } else if (CURRENCY_HEADER.equals(header)) {
+        return balance.getCurrency().name();
+      } else {
+        return balance.getAmount().toString();
+      }
+    }).collect(Collectors.joining(delimiter));
   }
 
   /**

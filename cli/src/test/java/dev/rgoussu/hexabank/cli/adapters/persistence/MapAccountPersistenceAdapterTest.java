@@ -60,7 +60,7 @@ public class MapAccountPersistenceAdapterTest {
         , "TEST_ACCOUNT_2", new CsvAccountRecord("TEST_ACCOUNT_2", Money.get(10, Currency.USD)));
     try (Stream<String> lines = Files.lines(tmp.toPath())) {
       Map<String, CsvAccountRecord> actual = underTest.mapCsvToAccountRecord(lines);
-      assertEquals(expected,actual);
+      assertEquals(expected, actual);
     }
     tmp.deleteOnExit();
   }

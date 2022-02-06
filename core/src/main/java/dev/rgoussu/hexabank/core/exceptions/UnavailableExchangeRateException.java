@@ -5,9 +5,10 @@ package dev.rgoussu.hexabank.core.exceptions;
  */
 public class UnavailableExchangeRateException extends RuntimeException {
 
-  public UnavailableExchangeRateException(String message){
+  public UnavailableExchangeRateException(String message) {
     super(message);
   }
+
   public UnavailableExchangeRateException(String message, Throwable cause) {
     super(message, cause);
   }

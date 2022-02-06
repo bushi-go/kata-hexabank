@@ -7,21 +7,21 @@ import dev.rgoussu.hexabank.core.model.values.Money;
  * Interface defining the account operation services.
  */
 public interface AccountOperationService {
-    /**
-     * Process a deposit to the account with the given id.
-     * Returns a dto encapsulating the result
-     *
-     * @param accountId the target account id
-     * @param deposit   the deposit to be made
-     * @return à dto encapsulating the result
-     */
-    DepositResult processDeposit(String accountId, Money deposit);
+  /**
+   * Process a deposit to the account with the given id.
+   * Returns a dto encapsulating the result
+   *
+   * @param accountId the target account id
+   * @param deposit   the deposit to be made
+   * @return à dto encapsulating the result
+   */
+  DepositResult processDeposit(String accountId, Money deposit);
 
-    /**
-     * Check an account number for existence
-     *
-     * @param account account number
-     * @return true if valid account, false otherwise
-     */
-    boolean checkAccount(String account);
+  /**
+   * Check an account number for existence.
+   *
+   * @param account account number
+   * @return true if valid account, false otherwise
+   */
+  boolean checkAccount(String account);
 }

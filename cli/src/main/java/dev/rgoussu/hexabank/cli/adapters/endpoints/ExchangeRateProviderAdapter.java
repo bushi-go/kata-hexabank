@@ -6,6 +6,10 @@ import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
+/**
+ * Static, offline exchange rate provider, providing rates from a hard coded map.
+ * Can provide rates for EUR -> USD, EUR -> GBP, and vice versa.
+ */
 @Component
 public class ExchangeRateProviderAdapter implements ExchangeRateProviderPort {
 
@@ -16,12 +20,6 @@ public class ExchangeRateProviderAdapter implements ExchangeRateProviderPort {
       new Pair<>(Currency.GBP, Currency.EUR), 1.20
   );
 
-  private record Pair<A, B>(A first, B second) {
-    public static <A, B> Pair<A, B> of(A first, B second) {
-      return new Pair<>(first, second);
-    }
-  }
-
   @Override
   public double getExchangeRateForCurrencies(Currency from, Currency to)
       throws UnavailableExchangeRateException {
@@ -31,5 +29,11 @@ public class ExchangeRateProviderAdapter implements ExchangeRateProviderPort {
     }
     throw new UnavailableExchangeRateException(
         "Conversion from " + from + " to " + to + " is not supported");
+  }
+
+  private record Pair<A, B>(A first, B second) {
+    public static <A, B> Pair<A, B> of(A first, B second) {
+      return new Pair<>(first, second);
+    }
   }
 }

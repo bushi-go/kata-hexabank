@@ -15,57 +15,57 @@ import org.slf4j.LoggerFactory;
  */
 public class AccountOperationManager implements AccountOperationService {
 
-    private static final String LOG_TAG = "AccountOperationService";
-    private final Logger logger = LoggerFactory.getLogger(LOG_TAG);
+  private static final String LOG_TAG = "AccountOperationService";
+  private final Logger logger = LoggerFactory.getLogger(LOG_TAG);
 
-    private final AccountPersistencePort accountPersistencePort;
-    private final ExchangeRateProviderPort exchangeRateProviderPort;
+  private final AccountPersistencePort accountPersistencePort;
+  private final ExchangeRateProviderPort exchangeRateProviderPort;
 
-    public AccountOperationManager(AccountPersistencePort accountPersistencePort,
-                                   ExchangeRateProviderPort exchangeRateProviderPort) {
-        this.accountPersistencePort = accountPersistencePort;
-        this.exchangeRateProviderPort = exchangeRateProviderPort;
+  public AccountOperationManager(AccountPersistencePort accountPersistencePort,
+                                 ExchangeRateProviderPort exchangeRateProviderPort) {
+    this.accountPersistencePort = accountPersistencePort;
+    this.exchangeRateProviderPort = exchangeRateProviderPort;
+  }
+
+  @Override
+  public DepositResult processDeposit(String accountId, Money deposit) {
+    logger.info("[Account n° {}] processing deposit of {} to account", accountId, deposit);
+    try {
+      logger.debug("[Account n° {}] retrieving account", accountId);
+      Account account = accountPersistencePort
+          .findByAccountId(accountId);
+      Money finalDeposit;
+      if (account.getOperatingCurrency().equals(deposit.getCurrency())) {
+        logger.debug(
+            "[Account n° {}] deposit and account on the same currency, proceeding to deposit",
+            accountId);
+        finalDeposit = deposit;
+      } else {
+        logger.debug(
+            "[Account n° {}] account and deposit not operating "
+                + "under same currency, requesting exchange rate",
+            accountId);
+        double exchangeRate =
+            exchangeRateProviderPort.getExchangeRateForCurrencies(deposit.getCurrency(),
+                account.getOperatingCurrency());
+        finalDeposit = deposit.convert(account.getOperatingCurrency(), exchangeRate);
+      }
+      account = account.deposit(finalDeposit);
+      accountPersistencePort.save(account);
+      return DepositResult.success(accountId, account.getBalance());
+    } catch (NoSuchAccountException e) {
+      return DepositResult.noSuchAccount(accountId);
+    } catch (UnavailableExchangeRateException e) {
+      return DepositResult.unavailableExchangeRate(accountId);
     }
+  }
 
-    @Override
-    public DepositResult processDeposit(String accountId, Money deposit) {
-        logger.info("[Account n° {}] processing deposit of {} to account", accountId, deposit);
-        try {
-            logger.debug("[Account n° {}] retrieving account", accountId);
-            Account account = accountPersistencePort
-                    .findByAccountId(accountId);
-            Money finalDeposit;
-            if (account.getOperatingCurrency().equals(deposit.getCurrency())) {
-                logger.debug(
-                        "[Account n° {}] deposit and account on the same currency, proceeding to deposit",
-                        accountId);
-                finalDeposit = deposit;
-            } else {
-                logger.debug(
-                        "[Account n° {}] account and deposit not operating "
-                                + "under same currency, requesting exchange rate",
-                        accountId);
-                double exchangeRate =
-                        exchangeRateProviderPort.getExchangeRateForCurrencies(deposit.getCurrency(),
-                                account.getOperatingCurrency());
-                finalDeposit = deposit.convert(account.getOperatingCurrency(), exchangeRate);
-            }
-            account = account.deposit(finalDeposit);
-            accountPersistencePort.save(account);
-            return DepositResult.success(accountId, account.getBalance());
-        } catch (NoSuchAccountException e) {
-            return DepositResult.noSuchAccount(accountId);
-        } catch (UnavailableExchangeRateException e) {
-            return DepositResult.unavailableExchangeRate(accountId);
-        }
+  @Override
+  public boolean checkAccount(String account) {
+    try {
+      return accountPersistencePort.findByAccountId(account) != null;
+    } catch (NoSuchAccountException e) {
+      return false;
     }
-
-    @Override
-    public boolean checkAccount(String account) {
-        try{
-            return accountPersistencePort.findByAccountId(account) != null;
-        }catch(NoSuchAccountException e){
-            return false;
-        }
-    }
+  }
 }

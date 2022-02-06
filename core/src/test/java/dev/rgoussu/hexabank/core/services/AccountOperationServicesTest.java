@@ -1,5 +1,7 @@
 package dev.rgoussu.hexabank.core.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import dev.rgoussu.hexabank.core.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.core.exceptions.UnavailableExchangeRateException;
 import dev.rgoussu.hexabank.core.model.dto.DepositResult;
@@ -8,17 +10,14 @@ import dev.rgoussu.hexabank.core.model.types.Currency;
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driven.AccountPersistencePort;
 import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
-
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AccountOperationServicesTest {
 
@@ -28,6 +27,11 @@ public class AccountOperationServicesTest {
   private final AccountOperationService underTest =
       new AccountOperationManager(persistencePort, exchangeRateProviderPort);
   private final String accountId = UUID.randomUUID().toString();
+
+  public static Stream<Arguments> generateDepositInDifferentCurrency() {
+    return Stream.of(Arguments.of(100.0, 0.88, Currency.USD),
+        Arguments.of(50.0, 1.20, Currency.GBP), Arguments.of(50000, 0.0078, Currency.JPY));
+  }
 
   @BeforeEach
   public void reset() {
@@ -82,10 +86,5 @@ public class AccountOperationServicesTest {
     DepositResult expected = DepositResult.unavailableExchangeRate(accountId);
     DepositResult actual = underTest.processDeposit(accountId, deposit);
     assertEquals(expected, actual);
-  }
-
-  public static Stream<Arguments> generateDepositInDifferentCurrency() {
-    return Stream.of(Arguments.of(100.0, 0.88, Currency.USD),
-        Arguments.of(50.0, 1.20, Currency.GBP), Arguments.of(50000, 0.0078, Currency.JPY));
   }
 }
