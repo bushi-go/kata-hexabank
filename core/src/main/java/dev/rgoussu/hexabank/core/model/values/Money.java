@@ -71,4 +71,17 @@ public class Money {
     return amount.toString() + " " + currency.getSymbol();
   }
 
+  public Money minus(Money other) {
+    if(!currency.equals(other.getCurrency())){
+      throw new IllegalArgumentException("Can not add money in different currencies : "
+          + this.currency
+          + " to "
+          + other.currency);
+    }
+    return Money.get(amount.subtract(other.getAmount()), currency);
+  }
+
+  public Money negate() {
+    return Money.get(amount.negate(), currency);
+  }
 }
