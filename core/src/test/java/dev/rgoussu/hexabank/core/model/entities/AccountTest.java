@@ -54,4 +54,14 @@ public class AccountTest {
     Account actual = underTest.deposit(deposit);
     assertEquals(expected, actual);
   }
+
+  @Test
+  public void givenAccountAndWithdrawalShouldRemoveFromBalance(){
+    String account = UUID.randomUUID().toString();
+    Account underTest = Account.create(account, 1000);
+    Money withdrawal = Money.get(100, Currency.EUR);
+    Account expected = Account.create(account, 900);
+    Account actual = underTest.withdraw(withdrawal);
+    assertEquals(expected, actual);
+  }
 }
