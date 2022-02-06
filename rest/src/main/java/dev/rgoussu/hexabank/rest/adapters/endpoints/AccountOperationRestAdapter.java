@@ -2,15 +2,17 @@ package dev.rgoussu.hexabank.rest.adapters.endpoints;
 
 import dev.rgoussu.hexabank.core.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.model.types.OperationStatus;
+import dev.rgoussu.hexabank.core.model.types.OperationType;
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
 import dev.rgoussu.hexabank.core.services.AccountOperationService;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.InvalidOperationParameterException;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.model.ApplicationError;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.model.ErrorCode;
-import dev.rgoussu.hexabank.rest.adapters.endpoints.model.dto.DepositResultDto;
+import dev.rgoussu.hexabank.rest.adapters.endpoints.model.dto.OperationResultDto;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.function.BiFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,21 +41,27 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
   @Override
   public ResponseEntity<?> deposit(@PathVariable("accountId") String accountId,
                                    @RequestBody Money deposit) {
-    checkDeposit(accountId, deposit);
-    if (accountId == null
-        || deposit == null
-        || deposit.getAmount() == null
-        || deposit.getAmount().equals(BigDecimal.ZERO)
-        || deposit.getCurrency() == null) {
-      return ResponseEntity.badRequest().build();
-    }
-    log.info("[Account n°{}] processing deposit of {}", accountId, deposit);
-    OperationResult result = service.processDeposit(accountId, deposit);
+
+    checkAmount(accountId, deposit);
+    return processOperation(accountId, deposit, OperationType.DEPOSIT);
+  }
+
+  @PutMapping(value = "/{accountId}/withdraw", consumes = {
+      MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+  @Override
+  public ResponseEntity<?> witdraw(@PathVariable("accountId") String accountId, @RequestBody Money withdraw) {
+    checkAmount(accountId, withdraw);
+    return processOperation(accountId, withdraw, OperationType.WITHDRAW);
+  }
+
+  private ResponseEntity<?> processOperation(String accountId, Money amount, OperationType type) {
+    OperationResult result = getOperation(type).apply(accountId, amount);
     if (OperationStatus.SUCCESS.equals(result.getStatus())) {
-      log.info("[Account n°{}] deposit of {} successful", accountId, deposit);
-      return ResponseEntity.ok(DepositResultDto.builder()
+      log.info("[Account n°{}] {} of {} successful", accountId, type, amount);
+      return ResponseEntity.ok(OperationResultDto.builder()
           .balance(result.getBalance())
-          .deposit(deposit)
+          .amount(amount)
+          .type(type)
           .build());
     }
 
@@ -67,16 +75,16 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
             .message("Account " + accountId + " does not exist");
       }
       case COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY -> {
-        log.warn("[Account n°{}] could not get exchange rate for this deposit", accountId);
+        log.warn("[Account n°{}] could not get exchange rate for this {}", accountId, type);
         builder.errorCode(ErrorCode.EXCHANGE_RATE_UNAVAILABLE)
-            .message("Deposit requires a conversion, and "
+            .message(type + " requires a conversion, and "
                 + "no exchange rate provider could provide one")
             .build();
       }
       default -> {
         log.warn(
-            "[Account n°{}] an error occured during processing and the deposit could not be made",
-            accountId);
+            "[Account n°{}] an error occured during processing and the {} could not be made",
+            accountId, type);
         builder.errorCode(ErrorCode.UNKNOWN_ERROR)
             .message("An unexpected error occurred during processing");
       }
@@ -84,18 +92,25 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
     return builder.build().toResponse();
   }
 
-  private void checkDeposit(String accountId, Money deposit) throws IllegalArgumentException {
+  private BiFunction<String, Money, OperationResult> getOperation(OperationType type) {
+    return switch (type) {
+      case DEPOSIT -> service::processDeposit;
+      case WITHDRAW -> service::processWithdrawal;
+    };
+  }
+
+  private void checkAmount(String accountId, Money deposit) throws IllegalArgumentException {
     if (accountId == null) {
       throw new InvalidOperationParameterException(ErrorCode.NO_ACCOUNT_NUMBER_PROVIDED,
           "No account id was provided");
     }
     if (deposit == null) {
       throw new InvalidOperationParameterException(ErrorCode.NO_DEPOSIT_PROVIDED,
-          "No deposit was provided");
+          "No amount was provided");
     }
     if (deposit.getAmount() == null || deposit.getAmount().equals(BigDecimal.ZERO)) {
       throw new InvalidOperationParameterException(ErrorCode.INVALID_DEPOSIT_AMOUNT,
-          "Invalid amount for deposit" + deposit.getAmount());
+          "Invalid amount for operation" + deposit.getAmount());
     }
     if (deposit.getCurrency() == null) {
       throw new InvalidOperationParameterException(ErrorCode.NO_CURRENCY_PROVIDED,

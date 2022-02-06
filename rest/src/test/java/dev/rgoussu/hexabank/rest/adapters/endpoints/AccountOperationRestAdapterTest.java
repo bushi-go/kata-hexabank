@@ -103,7 +103,7 @@ public class AccountOperationRestAdapterTest {
   }
 
   @Test
-  public void givenInvalidInputShouldReturn400() throws Exception {
+  public void givenInvalidDepositInputShouldReturn400() throws Exception {
     String accountId = UUID.randomUUID().toString();
     when(accountOperationService.processDeposit(anyString(),any(Money.class)))
         .thenReturn(
@@ -132,7 +132,7 @@ public class AccountOperationRestAdapterTest {
   }
 
   @Test
-  public void givenUncatchedExceptionShouldReturn500WithError() throws Exception {
+  public void givenDepositUncatchedExceptionShouldReturn500WithError() throws Exception {
     String accountId = UUID.randomUUID().toString();
     when(accountOperationService.processDeposit(anyString(),any(Money.class)))
         .thenThrow(new IllegalStateException("IllegalState"));
@@ -145,4 +145,92 @@ public class AccountOperationRestAdapterTest {
     assertEquals("IllegalState", actual.jsonPath().get("message"));
   }
 
+
+  @Test
+  public void givenValidWithdrawShouldReturn200WithNewBalance() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenReturn(
+            OperationResult.builder().accountId(accountId).status(OperationStatus.SUCCESS).error(
+                OperationError.NONE).balance(Money.get(1010, Currency.EUR)).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\":\"EUR\"}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(200, actual.statusCode());
+    assertEquals(MediaType.APPLICATION_JSON_VALUE, actual.contentType());
+    assertEquals(1010, ((Float) actual.jsonPath().get("balance.amount")).intValue());
+  }
+  @Test
+  public void givenWithdrawAndExchangeRateNotAvailableShouldReturn503() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenReturn(
+            OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
+                OperationError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\":\"USD\"}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(503, actual.statusCode());
+  }
+  @Test
+  public void givenWithdrawAndAccoutNotFoundShouldReturn404() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenReturn(
+            OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
+                OperationError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\":\"USD\"}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(404, actual.statusCode());
+  }
+
+  @Test
+  public void givenInvalidInputForWithdrawShouldReturn400() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenReturn(
+            OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
+                OperationError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(400, actual.statusCode());
+  }
+  @Test
+  public void given0AmountWithdrawReturn400() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenReturn(
+            OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
+                OperationError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(400, actual.statusCode());
+  }
+
+  @Test
+  public void givenUncatchedExceptionOnWithdrawShouldReturn500WithError() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+        .thenThrow(new IllegalStateException("IllegalState"));
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\": \"EUR\"}")
+        .put("/api/account/{accountId}/withdraw", accountId);
+
+    assertEquals(500, actual.statusCode());
+    assertEquals("IllegalState", actual.jsonPath().get("message"));
+  }
 }

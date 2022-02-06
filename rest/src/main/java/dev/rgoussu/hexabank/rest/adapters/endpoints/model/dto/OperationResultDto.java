@@ -1,8 +1,7 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints.model.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import dev.rgoussu.hexabank.core.model.types.OperationType;
 import dev.rgoussu.hexabank.core.model.values.Money;
-import dev.rgoussu.hexabank.rest.adapters.endpoints.model.serializer.MoneySerializer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +20,8 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class DepositResultDto {
-  private Money deposit;
+public class OperationResultDto {
+  private OperationType type;
   private Money balance;
+  private Money amount;
 }
