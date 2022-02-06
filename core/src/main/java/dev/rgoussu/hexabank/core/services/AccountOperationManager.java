@@ -35,7 +35,7 @@ public class AccountOperationManager implements AccountOperationService {
 
   @Override
   public OperationResult processWithdrawal(String accountId, Money withdraw) {
-    return processOperation(accountId, withdraw, OperationType.WITHDRAWAL);
+    return processOperation(accountId, withdraw, OperationType.WITHDRAW);
   }
 
   private OperationResult processOperation(String accountId, Money amount, OperationType type){

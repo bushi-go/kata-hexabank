@@ -88,4 +88,14 @@ public class AccountOperationServicesTest {
     assertEquals(expected, actual);
   }
 
+  @Test
+  public void givenExistingAccountShouldProceedToWithdrawalSuccessfully(){
+    Account targetAccount = Account.create(accountId, 30);
+    Mockito.when(persistencePort.findByAccountId(accountId)).thenReturn(targetAccount);
+    Money withdrawal = Money.get(30, Currency.EUR);
+    OperationResult expected = OperationResult.success(accountId, Money.get(0, Currency.EUR));
+    OperationResult actual = underTest.processWithdrawal(accountId, withdrawal);
+    assertEquals(expected, actual);
+  }
+
 }
