@@ -98,6 +98,6 @@ public class Account {
   }
 
   public Account withdraw(Money withdrawal) {
-    return Account.create(accountId, 900);
+    return create(accountId, getOperatingCurrency(), balance.getAmount().subtract(withdrawal.getAmount()).longValue());
   }
 }

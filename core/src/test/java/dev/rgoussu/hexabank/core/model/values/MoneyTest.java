@@ -42,4 +42,18 @@ public class MoneyTest {
     Money money = Money.get(100, Currency.EUR);
     assertThrows(IllegalArgumentException.class, () -> money.convert(Currency.USD, exchangeRate));
   }
+
+  @ParameterizedTest
+  @CsvSource({
+      "15,20",
+      "30,45",
+      "60, 10"})
+  public void givenTwoCurrenciesShouldSubstract(double amount, double substract){
+    Money money = Money.get(amount, Currency.EUR);
+    Money sub = Money.get(substract, Currency.EUR);
+    Money actual = money.minus(substract);
+    Money expected = Money.get(amount-substract, Currency.EUR);
+    assertEquals(actual,expected);
+
+  }
 }
