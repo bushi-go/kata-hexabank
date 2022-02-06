@@ -33,7 +33,7 @@ public class AccountTest {
 
         Arguments.of(Money.get(1000, Currency.EUR), Money.get(20, Currency.EUR)),
 
-        Arguments.of(Money.get(1000, Currency.EUR), Money.get(30, Currency.EUR)),
+        Arguments.of(Money.get(300, Currency.EUR), Money.get(400, Currency.EUR)),
 
         Arguments.of(Money.get(100, Currency.EUR), Money.get(100, Currency.EUR))
     );
@@ -76,5 +76,10 @@ public class AccountTest {
         Account.create(account, initialBalance.getAmount().subtract(amount.getAmount()).longValue());
     Account actual = underTest.withdraw(amount);
     assertEquals(expected, actual);
+  }
+
+  @Test
+  public void givenWithdrawalInAnotherCurrencyShouldThrow(){
+    String account = UUID.randomUUID().toString();
   }
 }
