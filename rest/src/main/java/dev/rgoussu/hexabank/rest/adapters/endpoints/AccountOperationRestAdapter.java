@@ -1,7 +1,7 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.model.dto.DepositResult;
-import dev.rgoussu.hexabank.core.model.types.DepositStatus;
+import dev.rgoussu.hexabank.core.model.dto.OperationResult;
+import dev.rgoussu.hexabank.core.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
 import dev.rgoussu.hexabank.core.services.AccountOperationService;
@@ -48,8 +48,8 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
       return ResponseEntity.badRequest().build();
     }
     log.info("[Account n°{}] processing deposit of {}", accountId, deposit);
-    DepositResult result = service.processDeposit(accountId, deposit);
-    if (DepositStatus.SUCCESS.equals(result.getStatus())) {
+    OperationResult result = service.processDeposit(accountId, deposit);
+    if (OperationStatus.SUCCESS.equals(result.getStatus())) {
       log.info("[Account n°{}] deposit of {} successful", accountId, deposit);
       return ResponseEntity.ok(DepositResultDto.builder()
           .balance(result.getBalance())

@@ -13,9 +13,17 @@ public interface AccountOperationsPort<T> {
    * Process a deposit to the given account.
    *
    * @param accountId target account id
-   * @param deposit   deposit to be made
+   * @param deposit deposit to be made
    * @return to be defined by the implementing adapter
    */
   T deposit(String accountId, Money deposit);
 
+  /**
+   * Process a withdraw to the given account
+   *
+   * @param accountId target account id
+   * @param withdraw withdrawal to be made
+   * @return to be defined by the implementing adapter
+   */
+  T witdraw(String accountId, Money withdraw);
 }

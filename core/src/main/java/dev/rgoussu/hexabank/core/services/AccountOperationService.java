@@ -1,6 +1,6 @@
 package dev.rgoussu.hexabank.core.services;
 
-import dev.rgoussu.hexabank.core.model.dto.DepositResult;
+import dev.rgoussu.hexabank.core.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.model.values.Money;
 
 /**
@@ -15,8 +15,16 @@ public interface AccountOperationService {
    * @param deposit   the deposit to be made
    * @return à dto encapsulating the result
    */
-  DepositResult processDeposit(String accountId, Money deposit);
-
+  OperationResult processDeposit(String accountId, Money deposit);
+  /**
+   * Process a withdrawal to the account with the given id.
+   * Returns a dto encapsulating the result
+   *
+   * @param accountId the target account id
+   * @param deposit   the withdrawal to be made
+   * @return à dto encapsulating the result
+   */
+  OperationResult processWithdrawal(String accountId, Money deposit);
   /**
    * Check an account number for existence.
    *
