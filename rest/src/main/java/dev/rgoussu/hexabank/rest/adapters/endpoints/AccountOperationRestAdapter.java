@@ -8,16 +8,19 @@ import dev.rgoussu.hexabank.core.services.AccountOperationService;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.model.dto.DepositResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Rest adapter for all account operation.
  */
-@RestController("/account")
+@RestController
+@RequestMapping("/account")
 @Slf4j
 public class AccountOperationRestAdapter implements AccountOperationsPort<ResponseEntity<?>> {
 
@@ -27,7 +30,8 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
     this.service = service;
   }
 
-  @PutMapping("/{accountId}/deposit")
+  @PutMapping(value = "/{accountId}/deposit", consumes = {
+      MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
   @Override
   public ResponseEntity<?> deposit(@PathVariable("accountId") String accountId,
                                    @RequestBody Money deposit) {
