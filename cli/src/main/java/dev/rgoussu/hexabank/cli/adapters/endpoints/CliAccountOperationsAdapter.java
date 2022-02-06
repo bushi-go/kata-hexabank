@@ -44,6 +44,29 @@ public class CliAccountOperationsAdapter
   }
 
   @Override
+  public String witdraw(String accountId, Money withdraw) {
+    log.info("[Account n° {}] processing withdrawal on account", accountId);
+    OperationResult result = accountOperationService.processWithdrawal(accountId, withdraw);
+    String message;
+    switch (result.getStatus()) {
+      case SUCCESS -> {
+        log.info(
+            "[Account n° {}] successfully processed withdrawal. New balance : {}", accountId,
+            result.getBalance());
+        message = "Withdrawal successfull, new balance : " + result.getBalance();
+      }
+      case FAILURE -> {
+        log.info("[Account n° {}] failed to process withdrawal : {}", accountId,
+            result.getError());
+        message = "Failed to process deposit :" + result.getError();
+      }
+      default -> message = "Withdrawal is a " + result.getStatus()
+          + (result.getError() != null ? " error : " + result.getError() : "");
+    }
+    return message;
+  }
+
+  @Override
   public boolean isValidAccount(String account) {
     return accountOperationService.checkAccount(account);
   }
