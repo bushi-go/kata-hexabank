@@ -2,8 +2,9 @@ package dev.rgoussu.hexabank.core.services;
 
 import dev.rgoussu.hexabank.core.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.core.exceptions.UnavailableExchangeRateException;
-import dev.rgoussu.hexabank.core.model.dto.DepositResult;
+import dev.rgoussu.hexabank.core.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.model.entities.Account;
+import dev.rgoussu.hexabank.core.model.types.OperationType;
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driven.AccountPersistencePort;
 import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
@@ -28,35 +29,44 @@ public class AccountOperationManager implements AccountOperationService {
   }
 
   @Override
-  public DepositResult processDeposit(String accountId, Money deposit) {
-    logger.info("[Account n° {}] processing deposit of {} to account", accountId, deposit);
+  public OperationResult processDeposit(String accountId, Money deposit) {
+    return processOperation(accountId, deposit, OperationType.DEPOSIT);
+  }
+
+  @Override
+  public OperationResult processWithdrawal(String accountId, Money withdraw) {
+    return processOperation(accountId, withdraw, OperationType.WITHDRAWAL);
+  }
+
+  private OperationResult processOperation(String accountId, Money amount, OperationType type){
+    logger.info("[Account n° {}] processing {} of {} to account", accountId, type, amount);
     try {
       logger.debug("[Account n° {}] retrieving account", accountId);
       Account account = accountPersistencePort
           .findByAccountId(accountId);
       Money finalDeposit;
-      if (account.getOperatingCurrency().equals(deposit.getCurrency())) {
+      if (account.getOperatingCurrency().equals(amount.getCurrency())) {
         logger.debug(
-            "[Account n° {}] deposit and account on the same currency, proceeding to deposit",
-            accountId);
-        finalDeposit = deposit;
+            "[Account n° {}] {}} and account on the same currency, proceeding to {}}",
+            accountId, type, type);
+        finalDeposit = amount;
       } else {
         logger.debug(
-            "[Account n° {}] account and deposit not operating "
+            "[Account n° {}] account and {} not operating "
                 + "under same currency, requesting exchange rate",
-            accountId);
+            accountId, type);
         double exchangeRate =
-            exchangeRateProviderPort.getExchangeRateForCurrencies(deposit.getCurrency(),
+            exchangeRateProviderPort.getExchangeRateForCurrencies(amount.getCurrency(),
                 account.getOperatingCurrency());
-        finalDeposit = deposit.convert(account.getOperatingCurrency(), exchangeRate);
+        finalDeposit = amount.convert(account.getOperatingCurrency(), exchangeRate);
       }
-      account = account.deposit(finalDeposit);
+      account = type.getOperation().apply(account,finalDeposit);
       accountPersistencePort.save(account);
-      return DepositResult.success(accountId, account.getBalance());
+      return OperationResult.success(accountId, account.getBalance());
     } catch (NoSuchAccountException e) {
-      return DepositResult.noSuchAccount(accountId);
+      return OperationResult.noSuchAccount(accountId);
     } catch (UnavailableExchangeRateException e) {
-      return DepositResult.unavailableExchangeRate(accountId);
+      return OperationResult.unavailableExchangeRate(accountId);
     }
   }
 

@@ -1,6 +1,6 @@
 package dev.rgoussu.hexabank.cli.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.model.dto.DepositResult;
+import dev.rgoussu.hexabank.core.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.model.values.Money;
 import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
 import dev.rgoussu.hexabank.core.services.AccountOperationService;
@@ -23,7 +23,7 @@ public class CliAccountOperationsAdapter
   @Override
   public String deposit(String accountId, Money deposit) {
     log.info("[Account n° {}] processing deposit on account", accountId);
-    DepositResult result = accountOperationService.processDeposit(accountId, deposit);
+    OperationResult result = accountOperationService.processDeposit(accountId, deposit);
     String message;
     switch (result.getStatus()) {
       case SUCCESS -> {
