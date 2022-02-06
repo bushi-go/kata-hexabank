@@ -87,4 +87,5 @@ public class AccountOperationServicesTest {
     DepositResult actual = underTest.processDeposit(accountId, deposit);
     assertEquals(expected, actual);
   }
+
 }

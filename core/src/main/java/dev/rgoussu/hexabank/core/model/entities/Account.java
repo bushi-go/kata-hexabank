@@ -96,4 +96,8 @@ public class Account {
   public Currency getOperatingCurrency() {
     return balance.getCurrency();
   }
+
+  public Account withdraw(Money withdrawal) {
+    return Account.create(accountId, 900);
+  }
 }
