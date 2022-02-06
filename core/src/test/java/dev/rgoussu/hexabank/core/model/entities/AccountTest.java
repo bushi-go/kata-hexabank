@@ -27,6 +27,18 @@ public class AccountTest {
     );
   }
 
+  public static Stream<Arguments> generateWithdrawal() {
+    return Stream.of(
+        Arguments.of(Money.get(1000, Currency.EUR), Money.get(100, Currency.EUR)),
+
+        Arguments.of(Money.get(1000, Currency.EUR), Money.get(20, Currency.EUR)),
+
+        Arguments.of(Money.get(1000, Currency.EUR), Money.get(30, Currency.EUR)),
+
+        Arguments.of(Money.get(100, Currency.EUR), Money.get(100, Currency.EUR))
+    );
+  }
+
   @ParameterizedTest
   @MethodSource("generateDeposits")
   public void givenAccountAndDepositShouldAddToBalance(Money initialBalance, Money amount) {
@@ -55,13 +67,14 @@ public class AccountTest {
     assertEquals(expected, actual);
   }
 
-  @Test
-  public void givenAccountAndWithdrawalShouldRemoveFromBalance(){
+  @ParameterizedTest
+  @MethodSource("generateWithdrawal")
+  public void givenAccountAndWithdrawalShouldRemoveFromBalance(Money initialBalance, Money amount) {
     String account = UUID.randomUUID().toString();
-    Account underTest = Account.create(account, 1000);
-    Money withdrawal = Money.get(100, Currency.EUR);
-    Account expected = Account.create(account, 900);
-    Account actual = underTest.withdraw(withdrawal);
+    Account underTest = Account.create(account, initialBalance);
+    Account expected =
+        Account.create(account, initialBalance.getAmount().subtract(amount.getAmount()).longValue());
+    Account actual = underTest.withdraw(amount);
     assertEquals(expected, actual);
   }
 }
