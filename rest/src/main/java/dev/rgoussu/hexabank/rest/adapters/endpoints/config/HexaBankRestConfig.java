@@ -7,35 +7,51 @@ import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
 import dev.rgoussu.hexabank.core.services.AccountOperationManager;
 import dev.rgoussu.hexabank.core.services.AccountOperationService;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.model.serializer.MoneySerializer;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.time.format.DateTimeFormatter;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.format.DateTimeFormatter;
-
+/**
+ * Configuration for jackson object mapper and wiring of the core domain to its adapters.
+ */
 @Configuration
 public class HexaBankRestConfig {
 
-    private final MoneySerializer moneySerializer;
-    private static final String DATETIME_FORMAT="dd-MM-yyyy HH:mm:ss";
+  private static final String DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
+  private final MoneySerializer moneySerializer;
 
-    public HexaBankRestConfig(MoneySerializer moneySerializer) {
-        this.moneySerializer = moneySerializer;
-    }
+  public HexaBankRestConfig(MoneySerializer moneySerializer) {
+    this.moneySerializer = moneySerializer;
+  }
 
-    // We manage the creation of this bean through an @Bean to avoid having spring framework dependencies creeping into the core domain
-    @Bean
-    public AccountOperationService accountOperationService(ExchangeRateProviderPort exchangeRateProviderPort,
-                                                           AccountPersistencePort accountPersistencePort) {
-        return new AccountOperationManager(accountPersistencePort, exchangeRateProviderPort);
-    }
 
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
-        return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
-                .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT)))
-                .serializers(moneySerializer);
-    }
+  /**
+   * Bean for the account operation service.
+   *
+   * @param exchangeRateProviderPort exchange rate provider driven port
+   * @param accountPersistencePort account persistence driven port
+   * @return properly wired up account operations service
+   */
+  @Bean
+  public AccountOperationService accountOperationService(
+      ExchangeRateProviderPort exchangeRateProviderPort,
+      AccountPersistencePort accountPersistencePort) {
+    // TODO find a way to avoid this implementation to creep out of the core domain
+    // a Factory ought to do the trick
+    return new AccountOperationManager(accountPersistencePort, exchangeRateProviderPort);
+  }
+
+  /**
+   * Slightly adjusted object mapper.
+   *
+   * @return Jackson2ObjectMapperBuilderCustomizer customized to our needs
+   */
+  @Bean
+  public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
+    return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
+        .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT)))
+        .serializers(moneySerializer);
+  }
 }
 

@@ -5,13 +5,18 @@ import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
 import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
 import java.util.Scanner;
 
+/**
+ * Encapsulation of the workflow and display logic for a given operation on the cli.
+ */
 public abstract class BankOperation {
   protected final CliDisplay display;
   protected final AccountOperationsPort<String> service;
   protected final AccountValidator validator;
   private final int code;
   private final String name;
-  protected BankOperation(AccountOperationsPort<String> service, AccountValidator validator,CliDisplay display,int code, String name){
+
+  protected BankOperation(AccountOperationsPort<String> service, AccountValidator validator,
+                          CliDisplay display, int code, String name) {
     this.code = code;
     this.name = name;
     this.display = display;
@@ -26,21 +31,22 @@ public abstract class BankOperation {
   public int getCode() {
     return code;
   }
+
   public abstract void execute(Scanner scanner);
 
   protected String proceedToAccountNumber(Scanner scanner) {
     boolean doing = true;
-    String account ="";
-    while(doing) {
+    String account = "";
+    while (doing) {
 
 
       display.print("Please enter your account number");
       account = scanner.nextLine();
-      if(!account.isBlank()){
+      if (!account.isBlank()) {
 
-        if(validator.isValidAccount(account)) {
+        if (validator.isValidAccount(account)) {
           doing = false;
-        }else{
+        } else {
           display.printLeft(" Invalid account number");
         }
       }

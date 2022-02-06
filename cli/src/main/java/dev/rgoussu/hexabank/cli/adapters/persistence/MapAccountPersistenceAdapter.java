@@ -19,15 +19,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 /**
- * A simple map based, csv file backed store implementation for account data
+ * A simple map based, csv file backed store implementation for account data.
  */
 @Component
 public class MapAccountPersistenceAdapter implements AccountPersistencePort, FileAccountStore {
@@ -41,7 +38,8 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
 
     this.config = config;
     LOGGER.debug(config.getDelimiter());
-    // There is very little likelihood that this class will ever be used in a concurrent context, so a simple hashMap should be enough
+    // There is very little likelihood that this class will ever be used in a concurrent context,
+    // so a simple hashMap should be enough
     accountMap = new HashMap<>();
 
   }
@@ -55,23 +53,18 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
     try (Stream<String> stream = Files.lines(accountFile.toPath())) {
       // We collect the stream here to check for the header line
       accountMap.putAll(mapCsvToAccountRecord(stream));
-      LOGGER.info("Initialized {} accounts data from csv store located at {}", accountMap.size(), accountFile.getPath());
+      LOGGER.info("Initialized {} accounts data from csv store located at {}", accountMap.size(),
+          accountFile.getPath());
     } catch (FileNotFoundException e) {
       LOGGER.warn(
-          "Could not find account csv backing file, assuming none exists yet and trying to create one");
-      try {
-        if (config.getAccountCsvBackingFile().createNewFile()) {
-          LOGGER.info("New csv backing file created for account persistence at path {}",
-              config.getAccountCsvBackingFile().getAbsolutePath());
-        }
-      } catch (IOException j) {
-        LOGGER.error("Could not create account backing file for persistence, data loss danger");
-        throw new IllegalStateException(
-            "A problem occured during initialization of account data : ", e);
-      }
+          "Could not find account csv backing file");
+      throw new IllegalStateException(
+          "A problem occured during initialization of account data : ",
+          e);
     } catch (IOException e) {
       LOGGER.error(
-          "Could not open,create or read account backing file, run will be aborted to prevent data loss");
+          "Could not read account backing file, "
+              + "run will be aborted to prevent data loss");
       throw new IllegalStateException(
           "A problem occured during initialization of account data : ",
           e);
@@ -136,15 +129,15 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
       headerLine = CsvAccountRecord.getHeaderLine(delimiter);
       accountLines = lines;
     }
-    return
-        accountLines.stream().map(line -> {
-              try {
-                return CsvAccountRecord.fromCsv(line, delimiter, headerLine);
-              } catch (IllegalStateException e) {
-                LOGGER.error("Could not initialize account with line {}", line);
-                return null;
-              }
-            }).filter(Objects::nonNull)
-            .collect(Collectors.toMap(CsvAccountRecord::accountId, Function.identity()));
+    return accountLines.stream()
+        .map(line -> {
+          try {
+            return CsvAccountRecord.fromCsv(line, delimiter, headerLine);
+          } catch (IllegalStateException e) {
+            LOGGER.error("Could not initialize account with line {}", line);
+            return null;
+          }
+        }).filter(Objects::nonNull)
+        .collect(Collectors.toMap(CsvAccountRecord::accountId, Function.identity()));
   }
 }

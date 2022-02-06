@@ -8,10 +8,15 @@ import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration to provide a Map of all implemented operations, for convenience purposes.
+ */
+
 @Configuration
 public class BankOperationConfig {
   @Bean
-  Map<Integer, BankOperation> operations(List<BankOperation> operationList){
-    return operationList.stream().collect(Collectors.toMap(BankOperation::getCode, Function.identity()));
+  Map<Integer, BankOperation> operations(List<BankOperation> operationList) {
+    return operationList.stream()
+        .collect(Collectors.toMap(BankOperation::getCode, Function.identity()));
   }
 }

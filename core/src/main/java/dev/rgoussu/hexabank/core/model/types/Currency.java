@@ -35,8 +35,8 @@ public enum Currency {
   /**
    * Get the symbol for the currency.
    *
-   * @return the symbol for the currency,
-   *     or the unspecified currency symbol ("¤") if node was found with the java currency API
+   * @return the symbol for the currency, or the unspecified currency symbol ("¤")
+   *         if none was found via the java currency API
    */
   public String getSymbol() {
     try {

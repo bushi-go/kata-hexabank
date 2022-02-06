@@ -6,6 +6,9 @@ import java.nio.file.Paths;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * Configuration for the csv file based store of this cli application.
+ */
 @ConfigurationProperties(prefix = "store.csv")
 @Validated
 public class AccountCsvStoreConfig {
@@ -18,12 +21,12 @@ public class AccountCsvStoreConfig {
     return Paths.get(accountCsvBackingFile).toFile();
   }
 
-  public String getDelimiter() {
-    return delimiter;
-  }
-
   public void setAccountCsvBackingFile(String accountCsvBackingFile) {
     this.accountCsvBackingFile = accountCsvBackingFile;
+  }
+
+  public String getDelimiter() {
+    return delimiter;
   }
 
   public void setDelimiter(String delimiter) {
