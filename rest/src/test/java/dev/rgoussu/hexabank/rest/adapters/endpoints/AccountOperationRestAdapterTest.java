@@ -75,4 +75,76 @@ public class AccountOperationRestAdapterTest {
     assertEquals(MediaType.APPLICATION_JSON_VALUE, actual.contentType());
     assertEquals(1010, ((Float) actual.jsonPath().get("balance.amount")).intValue());
   }
+  @Test
+  public void givenDepositAndExchangeRateNotAvailableShouldReturn503() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+        .thenReturn(
+            DepositResult.builder().accountId(accountId).status(DepositStatus.FAILURE).error(
+                DepositError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\":\"USD\"}")
+        .put("/api/account/{accountId}/deposit", accountId);
+
+    assertEquals(503, actual.statusCode());
+  }
+  @Test
+  public void givenDepositAndAccoutNotFoundShouldReturn404() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+        .thenReturn(
+            DepositResult.builder().accountId(accountId).status(DepositStatus.FAILURE).error(
+                DepositError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\":\"USD\"}")
+        .put("/api/account/{accountId}/deposit", accountId);
+
+    assertEquals(404, actual.statusCode());
+  }
+
+  @Test
+  public void givenInvalidInputShouldReturn400() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+        .thenReturn(
+            DepositResult.builder().accountId(accountId).status(DepositStatus.FAILURE).error(
+                DepositError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10}")
+        .put("/api/account/{accountId}/deposit", accountId);
+
+    assertEquals(400, actual.statusCode());
+  }
+  @Test
+  public void given0AmountDepositReturn400() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+        .thenReturn(
+            DepositResult.builder().accountId(accountId).status(DepositStatus.FAILURE).error(
+                DepositError.UNKNOWN_ACCOUNT).build());
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10}")
+        .put("/api/account/{accountId}/deposit", accountId);
+
+    assertEquals(400, actual.statusCode());
+  }
+
+  @Test
+  public void givenUncatchedExceptionShouldReturn500WithError() throws Exception {
+    String accountId = UUID.randomUUID().toString();
+    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+        .thenThrow(new IllegalStateException("IllegalState"));
+
+    Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .body("{\"amount\":10, \"currency\": \"EUR\"}")
+        .put("/api/account/{accountId}/deposit", accountId);
+
+    assertEquals(500, actual.statusCode());
+    assertEquals("IllegalState", actual.jsonPath().get("message"));
+  }
+
 }
