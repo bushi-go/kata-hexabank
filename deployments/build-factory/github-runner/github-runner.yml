@@ -1,0 +1,7 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: Runner
+metadata:
+  name: hexa-runner
+spec:
+  repository: bushi-go/kata-hexabank
+  env: []
