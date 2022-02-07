@@ -1,9 +1,9 @@
 package dev.rgoussu.hexabank.cli.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.model.dto.OperationResult;
-import dev.rgoussu.hexabank.core.model.values.Money;
-import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
-import dev.rgoussu.hexabank.core.services.AccountOperationService;
+import dev.rgoussu.hexabank.core.operations.model.dto.OperationResult;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
+import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

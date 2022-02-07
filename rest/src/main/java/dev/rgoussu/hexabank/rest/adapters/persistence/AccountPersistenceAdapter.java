@@ -1,8 +1,8 @@
 package dev.rgoussu.hexabank.rest.adapters.persistence;
 
-import dev.rgoussu.hexabank.core.exceptions.NoSuchAccountException;
-import dev.rgoussu.hexabank.core.model.entities.Account;
-import dev.rgoussu.hexabank.core.ports.driven.AccountPersistencePort;
+import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
+import dev.rgoussu.hexabank.core.operations.model.entities.Account;
+import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
 import dev.rgoussu.hexabank.rest.adapters.persistence.model.AccountRecord;
 import org.springframework.stereotype.Component;
 

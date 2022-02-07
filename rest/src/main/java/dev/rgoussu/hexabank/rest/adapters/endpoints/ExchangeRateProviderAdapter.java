@@ -1,8 +1,8 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.exceptions.UnavailableExchangeRateException;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
+import dev.rgoussu.hexabank.core.operations.exceptions.UnavailableExchangeRateException;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.ports.driven.ExchangeRateProviderPort;
 import javax.money.Monetary;
 import javax.money.MonetaryException;
 import javax.money.convert.CurrencyConversion;

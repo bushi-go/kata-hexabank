@@ -1,8 +1,8 @@
 package dev.rgoussu.hexabank.cli.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.exceptions.UnavailableExchangeRateException;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
+import dev.rgoussu.hexabank.core.operations.exceptions.UnavailableExchangeRateException;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.ports.driven.ExchangeRateProviderPort;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 

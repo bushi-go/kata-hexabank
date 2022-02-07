@@ -1,8 +1,8 @@
 package dev.rgoussu.hexabank.cli.adapters.persistence.model;
 
-import dev.rgoussu.hexabank.core.model.entities.Account;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.model.entities.Account;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -2,9 +2,9 @@ package dev.rgoussu.hexabank.cli.adapters.persistence;
 
 import dev.rgoussu.hexabank.cli.adapters.persistence.config.AccountCsvStoreConfig;
 import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountRecord;
-import dev.rgoussu.hexabank.core.exceptions.NoSuchAccountException;
-import dev.rgoussu.hexabank.core.model.entities.Account;
-import dev.rgoussu.hexabank.core.ports.driven.AccountPersistencePort;
+import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
+import dev.rgoussu.hexabank.core.operations.model.entities.Account;
+import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import dev.rgoussu.hexabank.cli.adapters.persistence.config.AccountCsvStoreConfig;
 import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountRecord;
-import dev.rgoussu.hexabank.core.model.entities.Account;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.model.entities.Account;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
