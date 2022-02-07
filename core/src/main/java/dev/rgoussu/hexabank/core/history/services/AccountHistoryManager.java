@@ -1,26 +1,39 @@
 package dev.rgoussu.hexabank.core.history.services;
 
-import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
-import dev.rgoussu.hexabank.core.history.model.entities.AccountHistory;
+import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.history.ports.driven.AccountHistoryPersistencePort;
+import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
+import dev.rgoussu.hexabank.core.operations.model.entities.Account;
+import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
+import java.util.SortedSet;
 
-public class AccountHistoryManager implements AccountHistoryService{
+/**
+ * Account history manager
+ */
+public class AccountHistoryManager implements AccountHistoryService {
 
   private final AccountHistoryPersistencePort accountHistoryPersistencePort;
-
-  public AccountHistoryManager(AccountHistoryPersistencePort accountHistoryPersistencePort) {
+  private final AccountPersistencePort accountPersistencePort;
+  public AccountHistoryManager(AccountPersistencePort accountPersistencePort,AccountHistoryPersistencePort accountHistoryPersistencePort) {
+    this.accountPersistencePort = accountPersistencePort;
     this.accountHistoryPersistencePort = accountHistoryPersistencePort;
   }
 
   @Override
-  public AccountHistory getAccountHistory(String accountId) throws NoSuchAccountException {
-    return accountHistoryPersistencePort.findAccountHistory(accountId);
+  public AccountOperationsHistory getAccountOperationSummary(String accountId) throws NoSuchAccountException {
+    Account account = accountPersistencePort.findByAccountId(accountId);
+    SortedSet<AccountOperationSummary> operationsList = accountHistoryPersistencePort.findAccountHistory(accountId);
+    return AccountOperationsHistory.builder()
+        .operations(operationsList)
+        .accountId(accountId)
+        .balance(account.getBalance())
+        .build();
   }
 
   @Override
-  public void recordOperationToHistory(String accountId, AccountOperationSummary operationSummary) {
-    AccountHistory accountHistory = accountHistoryPersistencePort.findAccountHistory(accountId);
-    accountHistoryPersistencePort.saveAccountHistory(accountHistory.registerOperation(operationSummary));
+  public void recordOperationToHistory(String accountId, AccountOperationSummary operationSummary) throws NoSuchAccountException {
+    Account account = accountPersistencePort.findByAccountId(accountId);
+    accountHistoryPersistencePort.recordOperationSummary(operationSummary);
   }
 }
