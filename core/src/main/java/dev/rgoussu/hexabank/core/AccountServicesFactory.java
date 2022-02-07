@@ -21,8 +21,9 @@ public enum AccountServicesFactory {
   }
 
   public AccountHistoryService getAccountHistoryService(
+      AccountPersistencePort accountPersistencePort,
       AccountHistoryPersistencePort accountHistoryPersistencePort) {
-    return new AccountHistoryManager(accountHistoryPersistencePort);
+    return new AccountHistoryManager(accountPersistencePort,accountHistoryPersistencePort);
   }
 
 }

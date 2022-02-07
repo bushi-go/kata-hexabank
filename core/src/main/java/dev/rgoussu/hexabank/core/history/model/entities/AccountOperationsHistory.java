@@ -1,6 +1,7 @@
 package dev.rgoussu.hexabank.core.history.model.entities;
 
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.util.SortedSet;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,12 +18,13 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class AccountHistory {
+public class AccountOperationsHistory {
   private String accountId;
+  private Money balance;
   @Singular
   private SortedSet<AccountOperationSummary> operations;
 
-  public AccountHistory registerOperation(AccountOperationSummary operationSummary) {
+  public AccountOperationsHistory registerOperation(AccountOperationSummary operationSummary) {
     return this.toBuilder().operation(operationSummary).build();
   }
 }

@@ -1,7 +1,9 @@
 package dev.rgoussu.hexabank.core.history.ports.driven;
 
+import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
-import dev.rgoussu.hexabank.core.history.model.entities.AccountHistory;
+import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
+import java.util.SortedSet;
 
 public interface AccountHistoryPersistencePort {
 
@@ -10,7 +12,7 @@ public interface AccountHistoryPersistencePort {
    *
    * @param history the history to be saved
    */
-  void saveAccountHistory(AccountHistory history);
+  void recordOperationSummary(AccountOperationSummary history);
 
   /**
    * Collect and return the account history for the given account
@@ -18,6 +20,6 @@ public interface AccountHistoryPersistencePort {
    * @return the history of operations
    * @throws NoSuchAccountException if account could not be found
    */
-  AccountHistory findAccountHistory(String accountId) throws NoSuchAccountException;
+  SortedSet<AccountOperationSummary> findAccountHistory(String accountId) throws NoSuchAccountException;
 
 }
