@@ -1,7 +1,7 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints.model.dto;
 
-import dev.rgoussu.hexabank.core.model.types.OperationType;
-import dev.rgoussu.hexabank.core.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,8 +2,8 @@ package dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations;
 
 import dev.rgoussu.hexabank.cli.adapters.endpoints.AccountValidator;
 import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
-import dev.rgoussu.hexabank.core.model.types.OperationType;
-import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
+import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
 @Component

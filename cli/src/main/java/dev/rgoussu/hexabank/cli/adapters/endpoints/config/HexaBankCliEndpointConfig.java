@@ -1,9 +1,10 @@
 package dev.rgoussu.hexabank.cli.adapters.endpoints.config;
 
-import dev.rgoussu.hexabank.core.ports.driven.AccountPersistencePort;
-import dev.rgoussu.hexabank.core.ports.driven.ExchangeRateProviderPort;
-import dev.rgoussu.hexabank.core.services.AccountOperationManager;
-import dev.rgoussu.hexabank.core.services.AccountOperationService;
+import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
+import dev.rgoussu.hexabank.core.operations.ports.driven.ExchangeRateProviderPort;
+import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
+import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
+import dev.rgoussu.hexabank.core.AccountServicesFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,8 +17,10 @@ public class HexaBankCliEndpointConfig {
 
   @Bean
   public AccountOperationService accountOperationService(
+      AccountHistoryPort accountHistoryPort,
       ExchangeRateProviderPort exchangeRateProviderPort,
       AccountPersistencePort accountPersistencePort) {
-    return new AccountOperationManager(accountPersistencePort, exchangeRateProviderPort);
+    return AccountServicesFactory.INSTANCE.getOperationService(accountHistoryPort,
+        exchangeRateProviderPort, accountPersistencePort);
   }
 }

@@ -1,11 +1,11 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.model.dto.OperationResult;
-import dev.rgoussu.hexabank.core.model.types.OperationStatus;
-import dev.rgoussu.hexabank.core.model.types.OperationType;
-import dev.rgoussu.hexabank.core.model.values.Money;
-import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
-import dev.rgoussu.hexabank.core.services.AccountOperationService;
+import dev.rgoussu.hexabank.core.operations.model.dto.OperationResult;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
+import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.InvalidOperationParameterException;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.model.ApplicationError;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.exceptions.model.ErrorCode;
@@ -49,7 +49,8 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
   @PutMapping(value = "/{accountId}/withdraw", consumes = {
       MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
   @Override
-  public ResponseEntity<?> witdraw(@PathVariable("accountId") String accountId, @RequestBody Money withdraw) {
+  public ResponseEntity<?> witdraw(@PathVariable("accountId") String accountId,
+                                   @RequestBody Money withdraw) {
     checkAmount(accountId, withdraw);
     return processOperation(accountId, withdraw, OperationType.WITHDRAW);
   }

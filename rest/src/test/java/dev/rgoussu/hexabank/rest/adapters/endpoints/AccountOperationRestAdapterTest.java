@@ -8,12 +8,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-import dev.rgoussu.hexabank.core.model.dto.OperationResult;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.model.types.OperationError;
-import dev.rgoussu.hexabank.core.model.types.OperationStatus;
-import dev.rgoussu.hexabank.core.model.values.Money;
-import dev.rgoussu.hexabank.core.services.AccountOperationService;
+import dev.rgoussu.hexabank.core.operations.model.dto.OperationResult;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationError;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
 import dev.rgoussu.hexabank.rest.adapters.persistence.MongoAccountPersistenceRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -41,26 +41,24 @@ import org.springframework.web.context.WebApplicationContext;
 @Import(AccountOperationRestAdapter.class)
 public class AccountOperationRestAdapterTest {
 
-  @LocalServerPort
-  private int port;
-
-  @MockBean
-  private AccountOperationService accountOperationService;
   @MockBean
   MongoAccountPersistenceRepository repoBean;
+  @Autowired
+  WebApplicationContext context;
+  @LocalServerPort
+  private int port;
+  @MockBean
+  private AccountOperationService accountOperationService;
 
   @BeforeEach
   public void setup() {
     RestAssured.port = port;
   }
 
-  @Autowired
-  WebApplicationContext context;
-
   @Test
   public void givenValidDepositShouldReturn200WithNewBalance() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.SUCCESS).error(
                 OperationError.NONE).balance(Money.get(1010, Currency.EUR)).build());
@@ -73,10 +71,11 @@ public class AccountOperationRestAdapterTest {
     assertEquals(MediaType.APPLICATION_JSON_VALUE, actual.contentType());
     assertEquals(1010, ((Float) actual.jsonPath().get("balance.amount")).intValue());
   }
+
   @Test
   public void givenDepositAndExchangeRateNotAvailableShouldReturn503() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY).build());
@@ -87,10 +86,11 @@ public class AccountOperationRestAdapterTest {
 
     assertEquals(503, actual.statusCode());
   }
+
   @Test
   public void givenDepositAndAccoutNotFoundShouldReturn404() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -105,7 +105,7 @@ public class AccountOperationRestAdapterTest {
   @Test
   public void givenInvalidDepositInputShouldReturn400() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -116,10 +116,11 @@ public class AccountOperationRestAdapterTest {
 
     assertEquals(400, actual.statusCode());
   }
+
   @Test
   public void given0AmountDepositReturn400() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -134,7 +135,7 @@ public class AccountOperationRestAdapterTest {
   @Test
   public void givenDepositUncatchedExceptionShouldReturn500WithError() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processDeposit(anyString(),any(Money.class)))
+    when(accountOperationService.processDeposit(anyString(), any(Money.class)))
         .thenThrow(new IllegalStateException("IllegalState"));
 
     Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -149,7 +150,7 @@ public class AccountOperationRestAdapterTest {
   @Test
   public void givenValidWithdrawShouldReturn200WithNewBalance() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.SUCCESS).error(
                 OperationError.NONE).balance(Money.get(1010, Currency.EUR)).build());
@@ -162,10 +163,11 @@ public class AccountOperationRestAdapterTest {
     assertEquals(MediaType.APPLICATION_JSON_VALUE, actual.contentType());
     assertEquals(1010, ((Float) actual.jsonPath().get("balance.amount")).intValue());
   }
+
   @Test
   public void givenWithdrawAndExchangeRateNotAvailableShouldReturn503() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY).build());
@@ -176,10 +178,11 @@ public class AccountOperationRestAdapterTest {
 
     assertEquals(503, actual.statusCode());
   }
+
   @Test
   public void givenWithdrawAndAccoutNotFoundShouldReturn404() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -194,7 +197,7 @@ public class AccountOperationRestAdapterTest {
   @Test
   public void givenInvalidInputForWithdrawShouldReturn400() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -205,10 +208,11 @@ public class AccountOperationRestAdapterTest {
 
     assertEquals(400, actual.statusCode());
   }
+
   @Test
   public void given0AmountWithdrawReturn400() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenReturn(
             OperationResult.builder().accountId(accountId).status(OperationStatus.FAILURE).error(
                 OperationError.UNKNOWN_ACCOUNT).build());
@@ -223,7 +227,7 @@ public class AccountOperationRestAdapterTest {
   @Test
   public void givenUncatchedExceptionOnWithdrawShouldReturn500WithError() throws Exception {
     String accountId = UUID.randomUUID().toString();
-    when(accountOperationService.processWithdrawal(anyString(),any(Money.class)))
+    when(accountOperationService.processWithdrawal(anyString(), any(Money.class)))
         .thenThrow(new IllegalStateException("IllegalState"));
 
     Response actual = given().header("Content-Type", MediaType.APPLICATION_JSON_VALUE)

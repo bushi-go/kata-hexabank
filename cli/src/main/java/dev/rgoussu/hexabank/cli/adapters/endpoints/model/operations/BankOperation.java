@@ -2,29 +2,29 @@ package dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations;
 
 import dev.rgoussu.hexabank.cli.adapters.endpoints.AccountValidator;
 import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
-import dev.rgoussu.hexabank.core.model.types.Currency;
-import dev.rgoussu.hexabank.core.model.types.OperationType;
-import dev.rgoussu.hexabank.core.model.values.Money;
-import dev.rgoussu.hexabank.core.ports.driving.AccountOperationsPort;
+import dev.rgoussu.hexabank.core.operations.model.types.Currency;
+import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.BiFunction;
-import org.springframework.stereotype.Component;
 
 /**
  * Encapsulation of the workflow and display logic for a given operation on the cli.
  */
 public abstract class BankOperation {
+  private static final String CONFIRM_CODE = "Y";
+  private static final String NEGATE_CODE = "N";
   protected final CliDisplay display;
   protected final AccountOperationsPort<String> service;
   protected final AccountValidator validator;
   private final int code;
-  private static final String CONFIRM_CODE = "Y";
   private final OperationType type;
 
   protected BankOperation(AccountOperationsPort<String> service, AccountValidator validator,
-                        CliDisplay display, int code, OperationType type) {
+                          CliDisplay display, int code, OperationType type) {
     this.code = code;
     this.display = display;
     this.service = service;
@@ -43,7 +43,7 @@ public abstract class BankOperation {
   public void execute(Scanner scanner) {
     String accountNumber = proceedToAccountNumber(scanner);
     double amount = proceedToAmount(scanner);
-    display.print("You declared you wish to "+type+" " + amount + "€");
+    display.print("You declared you wish to " + type + " " + amount + "€");
     Currency currency = proceedToCurrency(scanner);
     String confirm = proceedToConfirm(amount, currency, accountNumber, scanner);
     if (Objects.equals(confirm, CONFIRM_CODE)) {
@@ -106,13 +106,13 @@ public abstract class BankOperation {
   private Currency proceedToCurrency(Scanner scanner) {
     display.print(
         "Do you wish to change the currency ? Is so please enter its code then hit enter key");
-    display.print("otherwise enter N key to proceed");
+    display.print("otherwise enter "+NEGATE_CODE+" key to proceed");
     boolean doing = true;
     Currency currency = Currency.EUR;
     while (doing) {
       if (scanner.hasNextLine()) {
         String currencyCode = scanner.nextLine();
-        if (!currencyCode.isBlank() && !currencyCode.equals("N")) {
+        if (!currencyCode.isBlank() && !currencyCode.equals(NEGATE_CODE)) {
           try {
             currency = Currency.valueOf(currencyCode);
             doing = false;
@@ -134,13 +134,13 @@ public abstract class BankOperation {
     String confirm = "";
     while (doing) {
       display.print(
-          "Do you confirm the "+type+" of " + amount + " " + currency.getSymbol() + " on account "
-              + accountNumber + " ?");
-      display.print("enter Y to confirm, enter N to cancel and go back to menu");
+          "Do you confirm the " + type + " of " + amount + " " + currency.getSymbol()
+              + " on account " + accountNumber + " ?");
+      display.print("enter "+CONFIRM_CODE+" to confirm, enter N to cancel and go back to menu");
       confirm = scanner.nextLine();
       if (!confirm.isBlank()
-          && (confirm.equalsIgnoreCase("Y")
-          || confirm.equalsIgnoreCase("N"))) {
+          && (confirm.equalsIgnoreCase(CONFIRM_CODE)
+          || confirm.equalsIgnoreCase(NEGATE_CODE))) {
         doing = false;
       }
     }

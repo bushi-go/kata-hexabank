@@ -3,7 +3,7 @@ package dev.rgoussu.hexabank.rest.adapters.endpoints.model.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import dev.rgoussu.hexabank.core.model.values.Money;
+import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.io.IOException;
 import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
