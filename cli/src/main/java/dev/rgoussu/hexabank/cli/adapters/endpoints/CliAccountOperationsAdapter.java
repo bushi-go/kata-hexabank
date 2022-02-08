@@ -44,7 +44,7 @@ public class CliAccountOperationsAdapter
   }
 
   @Override
-  public String witdraw(String accountId, Money withdraw) {
+  public String withdraw(String accountId, Money withdraw) {
     log.info("[Account n° {}] processing withdrawal on account", accountId);
     OperationResult result = accountOperationService.processWithdrawal(accountId, withdraw);
     String message;

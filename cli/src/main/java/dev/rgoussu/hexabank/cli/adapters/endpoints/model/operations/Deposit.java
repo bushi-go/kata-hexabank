@@ -7,7 +7,7 @@ import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Deposit extends BankOperation {
+public class Deposit extends MoneyBankOperation {
   private static final int DEPOSIT_CODE = 1;
 
   protected Deposit(

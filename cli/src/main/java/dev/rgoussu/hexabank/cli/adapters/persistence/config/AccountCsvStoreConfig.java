@@ -13,12 +13,22 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class AccountCsvStoreConfig {
 
+  private String accountHistoryCsvBackingFile;
   private String accountCsvBackingFile;
 
   private String delimiter;
 
   public File getAccountCsvBackingFile() throws IOException {
     return Paths.get(accountCsvBackingFile).toFile();
+  }
+
+  public File getAccountHistoryCsvBackingFile() throws IOException{
+    return Paths.get(accountHistoryCsvBackingFile).toFile();
+  }
+
+
+  public void setAccountHistoryCsvBackingFile(String file) throws IOException{
+    this.accountHistoryCsvBackingFile = file;
   }
 
   public void setAccountCsvBackingFile(String accountCsvBackingFile) {

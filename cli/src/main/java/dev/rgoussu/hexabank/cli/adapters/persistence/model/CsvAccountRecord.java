@@ -3,6 +3,7 @@ package dev.rgoussu.hexabank.cli.adapters.persistence.model;
 import dev.rgoussu.hexabank.core.operations.model.entities.Account;
 import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,8 +38,8 @@ public record CsvAccountRecord(String accountId, Money balance) {
    * @return true if the line is a header line, false otherwise
    */
   public static boolean isHeaderLine(String line) {
-    return line.contains(ID_HEADER) && line.contains(BALANCE_HEADER)
-        && line.contains(CURRENCY_HEADER);
+    return Arrays.stream(HEADERS).map(line::contains)
+        .reduce(true, (acc, res) -> acc && res);
   }
 
   public static String getDefaultDelimiter() {
@@ -95,15 +96,13 @@ public record CsvAccountRecord(String accountId, Money balance) {
    */
   public String toCsv(String delimiter, String headerLine) {
 
-    return Stream.of(headerLine.split("[" + delimiter + "]")).map(header -> {
-      if (ID_HEADER.equals(header)) {
-        return accountId;
-      } else if (CURRENCY_HEADER.equals(header)) {
-        return balance.getCurrency().name();
-      } else {
-        return balance.getAmount().toString();
+    return Stream.of(headerLine.split("[" + delimiter + "]")).map(header ->
+      switch(header) {
+        case ID_HEADER -> accountId;
+        case CURRENCY_HEADER ->  balance.getCurrency().name();
+        case BALANCE_HEADER ->  balance.getAmount().toString();
       }
-    }).collect(Collectors.joining(delimiter));
+    ).collect(Collectors.joining(delimiter));
   }
 
   /**

@@ -18,6 +18,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
+
 public class AccountOperationsHistory {
   private String accountId;
   private Money balance;

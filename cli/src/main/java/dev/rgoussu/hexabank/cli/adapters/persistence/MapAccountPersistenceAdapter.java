@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,9 +29,8 @@ import org.springframework.stereotype.Component;
  * A simple map based, csv file backed store implementation for account data.
  */
 @Component
+@Slf4j
 public class MapAccountPersistenceAdapter implements AccountPersistencePort, FileAccountStore {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger("AccountPersistenceService");
 
   private final AccountCsvStoreConfig config;
   private final Map<String, CsvAccountRecord> accountMap;
@@ -37,7 +38,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
   MapAccountPersistenceAdapter(AccountCsvStoreConfig config) {
 
     this.config = config;
-    LOGGER.debug(config.getDelimiter());
+    log.debug(config.getDelimiter());
     // There is very little likelihood that this class will ever be used in a concurrent context,
     // so a simple hashMap should be enough
     accountMap = new HashMap<>();
@@ -51,18 +52,17 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
    */
   public void readFromFile(File accountFile) throws IllegalStateException {
     try (Stream<String> stream = Files.lines(accountFile.toPath())) {
-      // We collect the stream here to check for the header line
       accountMap.putAll(mapCsvToAccountRecord(stream));
-      LOGGER.info("Initialized {} accounts data from csv store located at {}", accountMap.size(),
+      log.info("Initialized {} accounts data from csv store located at {}", accountMap.size(),
           accountFile.getPath());
     } catch (FileNotFoundException e) {
-      LOGGER.warn(
+      log.warn(
           "Could not find account csv backing file");
       throw new IllegalStateException(
           "A problem occured during initialization of account data : ",
           e);
     } catch (IOException e) {
-      LOGGER.error(
+      log.error(
           "Could not read account backing file, "
               + "run will be aborted to prevent data loss");
       throw new IllegalStateException(
@@ -88,19 +88,19 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
               writter.write(line);
               writter.newLine();
             } catch (IOException e) {
-              LOGGER.error("Could not writte data : {}", line, e);
+              log.error("Could not writte data : {}", line, e);
             }
           });
 
     } catch (IOException e) {
-      LOGGER.error("Could not save account data", e);
+      log.error("Could not save account data", e);
     }
   }
 
   @Override
   public Account findByAccountId(String accountId) throws NoSuchAccountException {
     if (!accountMap.containsKey(accountId)) {
-      LOGGER.warn("[Account n° {}] does not seem to exist", accountId);
+      log.warn("[Account n° {}] does not seem to exist", accountId);
       throw new NoSuchAccountException("No account found with id " + accountId);
     }
     return accountMap.get(accountId).toAccount();
@@ -116,7 +116,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
   protected Map<String, CsvAccountRecord> mapCsvToAccountRecord(Stream<String> lineStream) {
     List<String> lines = lineStream.collect(Collectors.toList());
     if (lines.size() == 0) {
-      LOGGER.info("No account data found");
+      log.info("No account data found");
     }
     String headerLine;
     List<String> accountLines;
@@ -134,7 +134,7 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
           try {
             return CsvAccountRecord.fromCsv(line, delimiter, headerLine);
           } catch (IllegalStateException e) {
-            LOGGER.error("Could not initialize account with line {}", line);
+            log.error("Could not initialize account with line {}", line);
             return null;
           }
         }).filter(Objects::nonNull)
