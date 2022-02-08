@@ -25,5 +25,5 @@ public interface AccountOperationsPort<T> {
    * @param withdraw  withdrawal to be made
    * @return to be defined by the implementing adapter
    */
-  T witdraw(String accountId, Money withdraw);
+  T withdraw(String accountId, Money withdraw);
 }

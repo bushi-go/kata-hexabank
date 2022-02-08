@@ -7,7 +7,7 @@ import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Withdrawal extends BankOperation {
+public class Withdrawal extends MoneyBankOperation {
 
   private static final int WITHDRAWAL_CODE = 2;
 

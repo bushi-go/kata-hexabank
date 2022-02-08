@@ -49,8 +49,8 @@ public class AccountOperationRestAdapter implements AccountOperationsPort<Respon
   @PutMapping(value = "/{accountId}/withdraw", consumes = {
       MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
   @Override
-  public ResponseEntity<?> witdraw(@PathVariable("accountId") String accountId,
-                                   @RequestBody Money withdraw) {
+  public ResponseEntity<?> withdraw(@PathVariable("accountId") String accountId,
+                                    @RequestBody Money withdraw) {
     checkAmount(accountId, withdraw);
     return processOperation(accountId, withdraw, OperationType.WITHDRAW);
   }
