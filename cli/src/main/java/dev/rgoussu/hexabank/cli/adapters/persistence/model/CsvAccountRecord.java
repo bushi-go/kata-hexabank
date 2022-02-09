@@ -5,6 +5,7 @@ import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,8 +102,9 @@ public record CsvAccountRecord(String accountId, Money balance) {
         case ID_HEADER -> accountId;
         case CURRENCY_HEADER ->  balance.getCurrency().name();
         case BALANCE_HEADER ->  balance.getAmount().toString();
+        default -> null;
       }
-    ).collect(Collectors.joining(delimiter));
+    ).filter(Objects::nonNull).collect(Collectors.joining(delimiter));
   }
 
   /**

@@ -10,9 +10,10 @@ public interface AccountHistoryPersistencePort {
   /**
    * Persist the account history of operations
    *
+   * @param accountId the account id
    * @param history the history to be saved
    */
-  void recordOperationSummary(AccountOperationSummary history);
+  void recordOperationSummary(String accountId,AccountOperationSummary history);
 
   /**
    * Collect and return the account history for the given account

@@ -1,7 +1,9 @@
 package dev.rgoussu.hexabank.core.operations.model.values;
 
+import com.puppycrawl.tools.checkstyle.AuditEventDefaultFormatter;
 import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -16,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Getter
-public class Money {
+public class Money {;
   private BigDecimal amount;
   private Currency currency;
 
@@ -68,7 +70,7 @@ public class Money {
 
   @Override
   public String toString() {
-    return amount.toString() + " " + currency.getSymbol();
+    return currency.format(amount);
   }
 
   public Money minus(Money other) {

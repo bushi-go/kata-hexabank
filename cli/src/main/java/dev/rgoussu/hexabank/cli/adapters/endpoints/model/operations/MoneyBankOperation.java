@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 /**
  * Encapsulation of the workflow and display logic for a given operation on the cli.
  */
-public abstract class MoneyBankOperation implements BankOperation  {
+public abstract class MoneyBankOperation implements BankOperation {
   private static final String CONFIRM_CODE = "Y";
   private static final String NEGATE_CODE = "N";
   protected final CliDisplay display;
@@ -24,7 +24,7 @@ public abstract class MoneyBankOperation implements BankOperation  {
   private final OperationType type;
 
   protected MoneyBankOperation(AccountOperationsPort<String> service, AccountValidator validator,
-                          CliDisplay display, int code, OperationType type) {
+                               CliDisplay display, int code, OperationType type) {
     this.code = code;
     this.display = display;
     this.service = service;
@@ -46,7 +46,7 @@ public abstract class MoneyBankOperation implements BankOperation  {
   public void execute(Scanner scanner) {
     String accountNumber = proceedToAccountNumber(scanner, display, validator);
     double amount = proceedToAmount(scanner);
-    display.print("You declared you wish to " + type + " " + amount + "€");
+    display.print("You declared you wish to " + type + " " + Currency.EUR.format(amount));
     Currency currency = proceedToCurrency(scanner);
     String confirm = proceedToConfirm(amount, currency, accountNumber, scanner);
     if (Objects.equals(confirm, CONFIRM_CODE)) {
@@ -89,7 +89,7 @@ public abstract class MoneyBankOperation implements BankOperation  {
   private Currency proceedToCurrency(Scanner scanner) {
     display.print(
         "Do you wish to change the currency ? Is so please enter its code then hit enter key");
-    display.print("otherwise enter "+NEGATE_CODE+" key to proceed");
+    display.print("otherwise enter " + NEGATE_CODE + " key to proceed");
     boolean doing = true;
     Currency currency = Currency.EUR;
     while (doing) {
@@ -116,9 +116,9 @@ public abstract class MoneyBankOperation implements BankOperation  {
     String confirm = "";
     while (doing) {
       display.print(
-          "Do you confirm the " + type + " of " + amount + " " + currency.getSymbol()
+          "Do you confirm the " + type + " of " + currency.format(amount)
               + " on account " + accountNumber + " ?");
-      display.print("enter "+CONFIRM_CODE+" to confirm, enter N to cancel and go back to menu");
+      display.print("enter " + CONFIRM_CODE + " to confirm, enter N to cancel and go back to menu");
       confirm = scanner.nextLine();
       if (!confirm.isBlank()
           && (confirm.equalsIgnoreCase(CONFIRM_CODE)

@@ -45,6 +45,11 @@ public class MapAccountPersistenceAdapter implements AccountPersistencePort, Fil
 
   }
 
+  @Override
+  public File getBackingFile() throws IOException {
+    return config.getAccountCsvBackingFile();
+  }
+
   /**
    * Initialization method that read the account data from the configured file into the map.
    *
