@@ -98,12 +98,12 @@ public record CsvAccountRecord(String accountId, Money balance) {
   public String toCsv(String delimiter, String headerLine) {
 
     return Stream.of(headerLine.split("[" + delimiter + "]")).map(header ->
-      switch(header) {
-        case ID_HEADER -> accountId;
-        case CURRENCY_HEADER ->  balance.getCurrency().name();
-        case BALANCE_HEADER ->  balance.getAmount().toString();
-        default -> null;
-      }
+        switch (header) {
+          case ID_HEADER -> accountId;
+          case CURRENCY_HEADER -> balance.getCurrency().name();
+          case BALANCE_HEADER -> balance.getAmount().toString();
+          default -> null;
+        }
     ).filter(Objects::nonNull).collect(Collectors.joining(delimiter));
   }
 

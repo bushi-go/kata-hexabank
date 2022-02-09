@@ -19,7 +19,7 @@ public interface AccountOperationsPort<T> {
   T deposit(String accountId, Money deposit);
 
   /**
-   * Process a withdraw to the given account
+   * Process a withdraw to the given account.
    *
    * @param accountId target account id
    * @param withdraw  withdrawal to be made

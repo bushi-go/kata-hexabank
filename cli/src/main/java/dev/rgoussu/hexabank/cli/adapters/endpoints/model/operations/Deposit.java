@@ -6,6 +6,9 @@ import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
 import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
+/**
+ * An encapsulation of the deposit procedure for this cli operation.
+ */
 @Component
 public class Deposit extends MoneyBankOperation {
   private static final int DEPOSIT_CODE = 1;

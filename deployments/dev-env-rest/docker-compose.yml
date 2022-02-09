@@ -7,16 +7,29 @@ services:
 
     env_file: ./.env-app
     ports:
-      - 8080:8080
+      - "8080:8080"
     links:
       - mongodb
+      - elastic
   mongodb:
     image: mongo:5.0.6
     env_file: ./.env-db
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
       - ./mongo/:/docker-entrypoint-initdb.d/
+  elastic:
+    image: elasticsearch:7.17.0
+    env_file: ./.env-elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
 volumes:
   mongo-data:
+  elastic-data:

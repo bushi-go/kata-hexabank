@@ -8,13 +8,16 @@ import java.io.IOException;
  */
 public interface FileAccountStore {
   File getBackingFile() throws IOException;
+
   default void readFromFile() throws IOException {
     readFromFile(getBackingFile());
   }
+
   void readFromFile(File accountFile);
 
   default void saveToFile() throws IOException {
     saveToFile(getBackingFile());
   }
+
   void saveToFile(File accountFile);
 }

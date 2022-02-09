@@ -1,5 +1,6 @@
 package dev.rgoussu.hexabank.rest.adapters.endpoints;
 
+import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
@@ -28,11 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/account")
 @Slf4j
-public class AccountOperationRestAdapter implements AccountOperationsPort<ResponseEntity<?>> {
+public class AccountRestAdapter implements AccountOperationsPort<ResponseEntity<?>> {
 
   private final AccountOperationService service;
 
-  public AccountOperationRestAdapter(AccountOperationService service) {
+  public AccountRestAdapter(AccountOperationService service,
+                            AccountHistoryPort accountHistoryPort) {
     this.service = service;
   }
 

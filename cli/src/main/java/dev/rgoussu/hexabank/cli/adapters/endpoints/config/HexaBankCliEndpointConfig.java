@@ -18,16 +18,18 @@ import org.springframework.context.annotation.Configuration;
 public class HexaBankCliEndpointConfig {
 
   @Bean
-  public AccountOperationService accountOperationService(AccountHistoryPort accountHistoryPort,
-                                                         ExchangeRateProviderPort exchangeRateProviderPort,
-                                                         AccountPersistencePort accountPersistencePort) {
+  public AccountOperationService accountOperationService(
+      AccountHistoryPort accountHistoryPort,
+      ExchangeRateProviderPort exchangeRateProviderPort,
+      AccountPersistencePort accountPersistencePort) {
     return AccountServicesFactory.INSTANCE.getOperationService(accountHistoryPort,
         exchangeRateProviderPort, accountPersistencePort);
   }
 
   @Bean
-  public AccountHistoryService accountHistoryService(AccountPersistencePort accountPersistencePort,
-                                                     AccountHistoryPersistencePort accountHistoryPersistencePort) {
+  public AccountHistoryService accountHistoryService(
+      AccountPersistencePort accountPersistencePort,
+      AccountHistoryPersistencePort accountHistoryPersistencePort) {
     return AccountServicesFactory.INSTANCE.getAccountHistoryService(accountPersistencePort,
         accountHistoryPersistencePort);
   }

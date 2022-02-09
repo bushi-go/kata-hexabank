@@ -6,6 +6,7 @@ import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,12 +15,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Account operation summary, giving a snapshot of an operation on an account.
+ */
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
-@EqualsAndHashCode(of = {"operationDate","operationStatus","operationError", "operationType", "operationAmount"})
+@EqualsAndHashCode(of = {"operationDate", "operationStatus", "operationError", "operationType",
+    "operationAmount"})
 public class AccountOperationSummary implements Comparable<AccountOperationSummary> {
 
   private static final Comparator<AccountOperationSummary> COMPARATOR =
@@ -33,7 +38,11 @@ public class AccountOperationSummary implements Comparable<AccountOperationSumma
   private OperationType operationType;
   private Money operationAmount;
   private Money balanceAfterOperation;
+  private CurrencyConversion conversion;
 
+  public Optional<CurrencyConversion> getConversion() {
+    return Optional.ofNullable(conversion);
+  }
 
   @Override
   public int compareTo(AccountOperationSummary other) {

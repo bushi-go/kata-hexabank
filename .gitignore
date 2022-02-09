@@ -12,3 +12,4 @@ google_checks.xml
 /logs/
 /settings/settings.xml
 /settings/
+.resourceCache/

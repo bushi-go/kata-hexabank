@@ -6,6 +6,9 @@ import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
 import dev.rgoussu.hexabank.core.operations.ports.driving.AccountOperationsPort;
 import org.springframework.stereotype.Component;
 
+/**
+ * Bean encapsulating the withdrawal process for this cli implementation.
+ */
 @Component
 public class Withdrawal extends MoneyBankOperation {
 

@@ -4,6 +4,7 @@ import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.core.operations.model.entities.Account;
 import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
 import dev.rgoussu.hexabank.rest.adapters.persistence.model.AccountRecord;
+import dev.rgoussu.hexabank.rest.adapters.persistence.mongo.MongoAccountPersistenceRepository;
 import org.springframework.stereotype.Component;
 
 /**

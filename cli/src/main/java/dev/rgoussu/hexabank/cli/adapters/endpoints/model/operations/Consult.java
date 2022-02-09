@@ -2,17 +2,19 @@ package dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations;
 
 import dev.rgoussu.hexabank.cli.adapters.endpoints.AccountValidator;
 import dev.rgoussu.hexabank.cli.adapters.endpoints.CliDisplay;
-import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
+import dev.rgoussu.hexabank.core.history.model.entities.AccountSummary;
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
-import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import org.springframework.stereotype.Component;
 
+/**
+ * Consult operation bean implementing the cli procedure to consult one's account summary.
+ */
 @Component
 public class Consult implements BankOperation {
 
@@ -45,8 +47,8 @@ public class Consult implements BankOperation {
   @Override
   public void execute(Scanner scanner) {
     String account = proceedToAccountNumber(scanner, display, validator);
-    AccountOperationsHistory history = service.getAccountHistory(account);
-    display.printCenteredAsSeparator("Account n° "+account);
+    AccountSummary history = service.getAccountHistory(account);
+    display.printCenteredAsSeparator("Account n° " + account);
     display.printLeft("Current balance : " + history.getBalance());
     display.printCenteredAsSeparator("");
     display.printLeft(getHeaderLine());

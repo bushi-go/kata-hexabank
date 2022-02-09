@@ -3,10 +3,8 @@ package dev.rgoussu.hexabank.cli.adapters.persistence;
 import dev.rgoussu.hexabank.cli.adapters.persistence.config.AccountCsvStoreConfig;
 import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountOperationRecord;
 import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountRecord;
-import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.history.ports.driven.AccountHistoryPersistencePort;
-import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,9 +26,13 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * A map based, csv-file backed account operation history store implementation.
+ */
 @Component
 @Slf4j
-public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPersistencePort, FileAccountStore {
+public class MapAccountHistoryPersistenceAdapter
+    implements AccountHistoryPersistencePort, FileAccountStore {
 
   private final AccountCsvStoreConfig config;
   private final Map<String, SortedSet<CsvAccountOperationRecord>> accountMap;
@@ -127,15 +129,16 @@ public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPersis
 
   @Override
   public void recordOperationSummary(String accountId, AccountOperationSummary operationSummary) {
-    SortedSet<CsvAccountOperationRecord> history = accountMap.getOrDefault(accountId, new TreeSet<>());
-    history.add(CsvAccountOperationRecord.fromOperationSummary(accountId,operationSummary));
+    SortedSet<CsvAccountOperationRecord> history =
+        accountMap.getOrDefault(accountId, new TreeSet<>());
+    history.add(CsvAccountOperationRecord.fromOperationSummary(accountId, operationSummary));
     accountMap.put(accountId, history);
   }
 
   @Override
   public SortedSet<AccountOperationSummary> findAccountHistory(String accountId)
       throws NoSuchAccountException {
-      return accountMap.getOrDefault(accountId, new TreeSet<>()).stream()
-              .map(CsvAccountOperationRecord::toSummary).collect(Collectors.toCollection(TreeSet::new));
+    return accountMap.getOrDefault(accountId, new TreeSet<>()).stream()
+        .map(CsvAccountOperationRecord::toSummary).collect(Collectors.toCollection(TreeSet::new));
   }
 }
