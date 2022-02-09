@@ -8,12 +8,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.model.dto.OperationResult;
 import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationError;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
+import dev.rgoussu.hexabank.rest.adapters.persistence.elastic.ElasticSearchAccountHistoryRepository;
 import dev.rgoussu.hexabank.rest.adapters.persistence.mongo.MongoAccountPersistenceRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,19 +40,23 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true",
     "server.servlet.context-path=/api"})
-@EnableAutoConfiguration(exclude = MongoAutoConfiguration.class)
+@EnableAutoConfiguration(exclude = {MongoAutoConfiguration.class,
+    ElasticsearchDataAutoConfiguration.class})
 @Import(AccountRestAdapter.class)
 public class AccountOperationRestAdapterTest {
 
   @MockBean
-  MongoAccountPersistenceRepository repoBean;
+  private MongoAccountPersistenceRepository repoBean;
+  @MockBean
+  private ElasticSearchAccountHistoryRepository esBean;
   @Autowired
   WebApplicationContext context;
   @LocalServerPort
   private int port;
   @MockBean
   private AccountOperationService accountOperationService;
-
+  @MockBean
+  private AccountHistoryPort accountHistoryPort;
   @BeforeEach
   public void setup() {
     RestAssured.port = port;
