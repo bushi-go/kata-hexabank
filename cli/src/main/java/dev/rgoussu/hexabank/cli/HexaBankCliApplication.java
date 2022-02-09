@@ -4,38 +4,43 @@ import dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations.Menu;
 import dev.rgoussu.hexabank.cli.adapters.persistence.FileAccountStore;
 import dev.rgoussu.hexabank.cli.adapters.persistence.config.AccountCsvStoreConfig;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Hexa bank Command Line Interface Application.
  */
 @SpringBootApplication
 @EnableConfigurationProperties(AccountCsvStoreConfig.class)
+@Slf4j
 public class HexaBankCliApplication implements CommandLineRunner {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger("Application");
 
   private final Menu menu;
 
   private final AccountCsvStoreConfig config;
 
-  private final FileAccountStore fileAccountStore;
+  private final List<FileAccountStore> fileAccountStore;
+  private final ApplicationContext context;
 
   /**
    * Public constructor.
    *
+   * @param context          the application context
    * @param menu             the root operation, displaying the menu
    * @param config           the csv account store config
    * @param fileAccountStore the file account store, to allow to read and write to it.
    */
-  public HexaBankCliApplication(Menu menu, AccountCsvStoreConfig config,
-                                FileAccountStore fileAccountStore) {
+  public HexaBankCliApplication(ApplicationContext context,
+                                Menu menu, AccountCsvStoreConfig config,
+                                List<FileAccountStore> fileAccountStore) {
+    this.context = context;
     this.menu = menu;
     this.config = config;
     this.fileAccountStore = fileAccountStore;
@@ -47,25 +52,47 @@ public class HexaBankCliApplication implements CommandLineRunner {
    * @param args cli args
    */
   public static void main(String... args) {
-    LOGGER.info("Starting hexabank CLI");
+    log.info("Starting hexabank CLI");
     SpringApplication.run(HexaBankCliApplication.class, args);
-    LOGGER.info("Stopping hexabank CLI");
+    log.info("Stopping hexabank CLI");
   }
 
   @Override
   public void run(String... args) throws IOException {
     init();
     Scanner scanner = new Scanner(System.in);
-    while (!menu.shouldExit()) {
-      menu.display(scanner);
+    try {
+      while (!menu.shouldExit()) {
+        menu.display(scanner);
+      }
+    }catch(Exception e){
+      log.error("AN error occured during execution", e);
+    }finally {
+      shutdownApplication();
     }
-    fileAccountStore.saveToFile(config.getAccountCsvBackingFile());
   }
 
-  private void init() throws IOException {
-    LOGGER.debug("Account file : {}, csv delimiter: {}",
-        config.getAccountCsvBackingFile().getPath(), config.getDelimiter());
-    fileAccountStore.readFromFile(config.getAccountCsvBackingFile());
+  private void shutdownApplication() {
+    log.info("[Application] saving data to file");
+    try {
+      for (FileAccountStore store : fileAccountStore) {
+        store.saveToFile();
+      }
+    }catch(IOException e){
+      log.error("Could not save account data !");
+      SpringApplication.exit(context, ()->2);
+    }
   }
 
+  private void init() {
+    try {
+      for (FileAccountStore store : fileAccountStore) {
+        store.readFromFile();
+      }
+      SpringApplication.exit(context, ()->0);
+    } catch (IOException e) {
+      log.error("Could not initialize account data from store, shutting down");
+      SpringApplication.exit(context, () -> 1);
+    }
+  }
 }

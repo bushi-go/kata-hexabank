@@ -1,5 +1,8 @@
 package dev.rgoussu.hexabank.core.operations.model.types;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Currency code ISO_4217 as of january 2022.
  * Uses the java currency API to get symbol for each currency
@@ -43,6 +46,16 @@ public enum Currency {
       return java.util.Currency.getInstance(this.name()).getSymbol();
     } catch (IllegalArgumentException e) {
       return UNSPECIFIED_CURRENCY;
+    }
+  }
+
+  public String format(Number amount){
+    try {
+      NumberFormat format = NumberFormat.getCurrencyInstance();
+      format.setCurrency(java.util.Currency.getInstance(this.name()));
+      return format.format(amount);
+    }catch(UnsupportedOperationException e){
+      return new DecimalFormat("#.###.00").format(amount) + " "+getSymbol();
     }
   }
 }

@@ -7,6 +7,7 @@ import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationType;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -14,25 +15,38 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Consult implements BankOperation {
-  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+
+  private final int dateColumnLength;
+  private final int typeColumnLength;
+  private final int statusColumnLength;
+  private final int remainingColumnLength;
+
+  private final DateTimeFormatter dateFormat;
   private final AccountValidator validator;
   private final CliDisplay display;
   private final AccountHistoryPort service;
 
   Consult(
+      DateTimeFormatter dateFormat,
       AccountHistoryPort accountHistoryPort,
       AccountValidator validator,
       CliDisplay display) {
+    this.dateFormat = dateFormat;
     this.display = display;
     this.service = accountHistoryPort;
     this.validator = validator;
+    dateColumnLength = dateFormat.format(Instant.now()).length();
+    typeColumnLength = OperationType.WITHDRAW.name().length();
+    statusColumnLength = OperationStatus.SUCCESS.name().length();
+    remainingColumnLength =
+        display.getLineLength() - dateColumnLength - typeColumnLength - statusColumnLength - 10;
   }
 
   @Override
   public void execute(Scanner scanner) {
     String account = proceedToAccountNumber(scanner, display, validator);
     AccountOperationsHistory history = service.getAccountHistory(account);
-    display.printCenteredAsSeparator(account);
+    display.printCenteredAsSeparator("Account n° "+account);
     display.printLeft("Current balance : " + history.getBalance());
     display.printCenteredAsSeparator("");
     display.printLeft(getHeaderLine());
@@ -40,22 +54,27 @@ public class Consult implements BankOperation {
     display.printLeftAsSeparator("");
     display.printLeft("Enter Y when you wish to return to the menu");
 
-    String confirm ="N";
-    while(!"Y".equalsIgnoreCase(confirm)){
+    String confirm = "N";
+    while (!"Y".equalsIgnoreCase(confirm)) {
       confirm = scanner.nextLine();
     }
   }
 
   private void printLine(AccountOperationSummary operation) {
-    display.printLeft(DATE_FORMATTER.format(operation.getOperationDate())
-        +"|"+operation.getOperationType().name()+"|"+operation.getOperationStatus().name()+"|"+operation.getOperationAmount());
+    String line =
+        display.paddCenter(dateFormat.format(operation.getOperationDate()), dateColumnLength) + "|"
+            + display.paddCenter(operation.getOperationType().name(), typeColumnLength) + "|"
+            + display.paddCenter(operation.getOperationStatus().name(), statusColumnLength) + " |"
+            + display.paddCenter(operation.getOperationAmount().toString(), remainingColumnLength);
+    display.printLeft(line);
     display.printLeft("Balance after operation:" + operation.getBalanceAfterOperation());
   }
 
   private String getHeaderLine() {
-    return "Date"+" ".repeat(DATE_FORMATTER.format(Instant.now()).length() -1) + "|"
-        +"Type" + " ".repeat(OperationType.WITHDRAW.name().length()-1)+"|" + "Status"+ " ".repeat(
-        OperationStatus.SUCCESS.name().length()-1)+"|"+"Amount";
+    return display.paddCenter("Date", dateColumnLength) + "|"
+        + display.paddCenter("Type ", typeColumnLength) + "|"
+        + display.paddCenter("Status", statusColumnLength) + "|"
+        + display.paddCenter("Amount", remainingColumnLength);
   }
 
   @Override

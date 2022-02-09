@@ -8,12 +8,16 @@ import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -38,11 +42,11 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
   private final Money operationAmount;
   private final Money balanceAfterOperation;
 
-  public CsvAccountOperationRecord(String accountId, Instant date,
-                                   OperationType operationType,
-                                   OperationStatus operationStatus,
-                                   Money operationAmount,
-                                   Money balanceAfterOperation) {
+  private CsvAccountOperationRecord(String accountId, Instant date,
+                                    OperationType operationType,
+                                    OperationStatus operationStatus,
+                                    Money operationAmount,
+                                    Money balanceAfterOperation) {
     this.accountId = accountId;
     this.date = date;
     this.operationType = operationType;
@@ -115,6 +119,17 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
     }
   }
 
+  public static CsvAccountOperationRecord fromOperationSummary(String accountId,
+                                                               AccountOperationSummary operationSummary) {
+    return CsvAccountOperationRecord.builder().accountId(accountId)
+        .date(operationSummary.getOperationDate())
+        .operationType(operationSummary.getOperationType())
+        .operationStatus(operationSummary.getOperationStatus())
+        .operationAmount(operationSummary.getOperationAmount())
+        .balanceAfterOperation(operationSummary.getBalanceAfterOperation())
+        .build();
+  }
+
   public String toCsv(String delimiter, String headerLine) {
     return Stream.of(headerLine.split("[" + delimiter + "]")).map(header -> switch (header) {
       case ACCOUNT_ID_HEADER -> accountId;
@@ -125,7 +140,8 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
       case CURRENCY_AMOUNT_HEADER -> operationAmount.getCurrency().name();
       case BALANCE_HEADER -> balanceAfterOperation.getAmount().toString();
       case CURRENCY_BALANCE_HEADER -> balanceAfterOperation.getCurrency().name();
-    }).collect(Collectors.joining(delimiter));
+      default -> null;
+    }).filter(Objects::nonNull).collect(Collectors.joining(delimiter));
   }
 
   public AccountOperationSummary toSummary() {

@@ -34,6 +34,6 @@ public class AccountHistoryManager implements AccountHistoryService {
   @Override
   public void recordOperationToHistory(String accountId, AccountOperationSummary operationSummary) throws NoSuchAccountException {
     Account account = accountPersistencePort.findByAccountId(accountId);
-    accountHistoryPersistencePort.recordOperationSummary(operationSummary);
+    accountHistoryPersistencePort.recordOperationSummary(account.getAccountId(),operationSummary);
   }
 }

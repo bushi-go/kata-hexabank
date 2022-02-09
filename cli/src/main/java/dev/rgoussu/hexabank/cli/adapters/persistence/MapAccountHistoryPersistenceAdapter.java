@@ -5,6 +5,7 @@ import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountOperationRe
 import dev.rgoussu.hexabank.cli.adapters.persistence.model.CsvAccountRecord;
 import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
+import dev.rgoussu.hexabank.core.history.ports.driven.AccountHistoryPersistencePort;
 import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 import java.io.BufferedWriter;
@@ -14,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPort, FileAccountStore {
+public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPersistencePort, FileAccountStore {
 
   private final AccountCsvStoreConfig config;
   private final Map<String, SortedSet<CsvAccountOperationRecord>> accountMap;
@@ -36,6 +38,11 @@ public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPort, 
   public MapAccountHistoryPersistenceAdapter(AccountCsvStoreConfig config) {
     this.accountMap = new HashMap<>();
     this.config = config;
+  }
+
+  @Override
+  public File getBackingFile() throws IOException {
+    return config.getAccountHistoryCsvBackingFile();
   }
 
   @Override
@@ -65,7 +72,8 @@ public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPort, 
       Stream<String> lineStream) {
     List<String> lines = lineStream.collect(Collectors.toList());
     if (lines.size() == 0) {
-      log.info("No account data found");
+      log.info("No account operations data found");
+      return Collections.emptyMap();
     }
     String headerLine;
     List<String> accountLines;
@@ -118,20 +126,16 @@ public class MapAccountHistoryPersistenceAdapter implements AccountHistoryPort, 
   }
 
   @Override
-  public AccountOperationsHistory getAccountHistory(String accountId)
-      throws NoSuchAccountException {
-    if (accountMap.containsKey(accountId)) {
-      return AccountOperationsHistory.builder()
-          .accountId(accountId)
-          .operations(accountMap.getOrDefault(accountId, new TreeSet<>()).stream()
-              .map(CsvAccountOperationRecord::toSummary).collect(Collectors.toList()))
-          .build();
-    }
-    throw new NoSuchAccountException("No account found for id " + accountId);
+  public void recordOperationSummary(String accountId, AccountOperationSummary operationSummary) {
+    SortedSet<CsvAccountOperationRecord> history = accountMap.getOrDefault(accountId, new TreeSet<>());
+    history.add(CsvAccountOperationRecord.fromOperationSummary(accountId,operationSummary));
+    accountMap.put(accountId, history);
   }
 
   @Override
-  public void registerOperationToHistory(String accountId, AccountOperationSummary operation) {
-
+  public SortedSet<AccountOperationSummary> findAccountHistory(String accountId)
+      throws NoSuchAccountException {
+      return accountMap.getOrDefault(accountId, new TreeSet<>()).stream()
+              .map(CsvAccountOperationRecord::toSummary).collect(Collectors.toCollection(TreeSet::new));
   }
 }
