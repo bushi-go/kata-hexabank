@@ -64,16 +64,16 @@ public class CliDisplay {
   }
 
   private String padMessageCenter(String message, String padding) {
-    int paddingSize = Math.max((LINE_LENGTH - 4 - message.length() - 1) / 2,0);
+    int paddingSize = Math.max((LINE_LENGTH - 4 - message.length() - 1) / 2, 0);
     return padding.repeat(paddingSize) + message + padding.repeat(paddingSize);
   }
 
-  public String paddCenter(String element,  int length){
+  public String paddCenter(String element, int length) {
     return paddCenter(element, " ", length);
   }
 
-  public String paddCenter(String element, String padding, int length){
-    int paddingSize = (length - element.length()+1) / 2;
+  public String paddCenter(String element, String padding, int length) {
+    int paddingSize = (length - element.length() + 1) / 2;
     return padding.repeat(paddingSize) + element + padding.repeat(paddingSize);
   }
 

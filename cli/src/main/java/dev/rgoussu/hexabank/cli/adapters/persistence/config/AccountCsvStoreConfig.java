@@ -22,17 +22,16 @@ public class AccountCsvStoreConfig {
     return Paths.get(accountCsvBackingFile).toFile();
   }
 
-  public File getAccountHistoryCsvBackingFile() throws IOException{
+  public void setAccountCsvBackingFile(String accountCsvBackingFile) {
+    this.accountCsvBackingFile = accountCsvBackingFile;
+  }
+
+  public File getAccountHistoryCsvBackingFile() throws IOException {
     return Paths.get(accountHistoryCsvBackingFile).toFile();
   }
 
-
-  public void setAccountHistoryCsvBackingFile(String file) throws IOException{
+  public void setAccountHistoryCsvBackingFile(String file) throws IOException {
     this.accountHistoryCsvBackingFile = file;
-  }
-
-  public void setAccountCsvBackingFile(String accountCsvBackingFile) {
-    this.accountCsvBackingFile = accountCsvBackingFile;
   }
 
   public String getDelimiter() {

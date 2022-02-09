@@ -1,6 +1,7 @@
 package dev.rgoussu.hexabank.core.operations.services;
 
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
+import dev.rgoussu.hexabank.core.history.model.values.CurrencyConversion;
 import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 import dev.rgoussu.hexabank.core.operations.exceptions.UnavailableExchangeRateException;
@@ -28,6 +29,13 @@ public class AccountOperationManager implements AccountOperationService {
   private final ExchangeRateProviderPort exchangeRateProviderPort;
   private final AccountHistoryPort accountHistoryPort;
 
+  /**
+   * public constructor.
+   *
+   * @param accountHistoryPort history driving port
+   * @param exchangeRateProviderPort exchange rate provider
+   * @param accountPersistencePort account persistence port
+   */
   public AccountOperationManager(
       AccountHistoryPort accountHistoryPort,
       ExchangeRateProviderPort exchangeRateProviderPort,
@@ -44,6 +52,9 @@ public class AccountOperationManager implements AccountOperationService {
 
   @Override
   public OperationResult processWithdrawal(String accountId, Money withdraw) {
+    if (withdraw.getAmount().signum() < 0) {
+      withdraw = withdraw.negate();
+    }
     return processOperation(accountId, withdraw, OperationType.WITHDRAW);
   }
 
@@ -72,6 +83,9 @@ public class AccountOperationManager implements AccountOperationService {
             exchangeRateProviderPort.getExchangeRateForCurrencies(amount.getCurrency(),
                 account.getOperatingCurrency());
         finalDeposit = amount.convert(account.getOperatingCurrency(), exchangeRate);
+        operationHistoryBuilder.conversion(
+            CurrencyConversion.builder().exchangeRate(exchangeRate).from(amount.getCurrency())
+                .to(account.getOperatingCurrency()).build());
       }
       account = type.getOperation().apply(account, finalDeposit);
       accountPersistencePort.save(account);

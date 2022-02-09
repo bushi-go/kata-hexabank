@@ -3,7 +3,6 @@ package dev.rgoussu.hexabank.core.operations.model.entities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.rgoussu.hexabank.core.operations.model.entities.Account;
 import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.util.UUID;

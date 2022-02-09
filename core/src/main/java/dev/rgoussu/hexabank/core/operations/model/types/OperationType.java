@@ -4,6 +4,10 @@ import dev.rgoussu.hexabank.core.operations.model.entities.Account;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import java.util.function.BiFunction;
 
+/**
+ * Available operation type.
+ * Encapsulate the corresponding account operation to improve code reuse.
+ */
 public enum OperationType {
   DEPOSIT {
     @Override

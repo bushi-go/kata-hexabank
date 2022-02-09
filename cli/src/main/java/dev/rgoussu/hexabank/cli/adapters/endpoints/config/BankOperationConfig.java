@@ -3,7 +3,6 @@ package dev.rgoussu.hexabank.cli.adapters.endpoints.config;
 import dev.rgoussu.hexabank.cli.adapters.endpoints.model.operations.BankOperation;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DecimalStyle;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +22,9 @@ public class BankOperationConfig {
     return operationList.stream()
         .collect(Collectors.toMap(BankOperation::getCode, Function.identity()));
   }
+
   @Bean
-  DateTimeFormatter dateFormat(){
+  DateTimeFormatter dateFormat() {
     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
   }
 

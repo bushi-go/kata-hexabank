@@ -1,9 +1,7 @@
 package dev.rgoussu.hexabank.core.operations.model.values;
 
-import com.puppycrawl.tools.checkstyle.AuditEventDefaultFormatter;
 import dev.rgoussu.hexabank.core.operations.model.types.Currency;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,12 +16,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Getter
-public class Money {;
+public class Money {
+  private static Money EMPTY = Money.get(0, Currency.UNSPECIFIED);
   private BigDecimal amount;
   private Currency currency;
 
   public static Money get(Number amount, Currency currency) {
     return new Money(BigDecimal.valueOf(amount.doubleValue()), currency);
+  }
+
+  public static Money empty() {
+    return EMPTY;
   }
 
   /**
@@ -39,6 +42,12 @@ public class Money {;
    * @throws IllegalArgumentException if the currencies of the two Money instance do not match
    */
   public Money plus(Money other) throws IllegalArgumentException {
+    if (this.equals(EMPTY)) {
+      return other;
+    }
+    if (other.equals(EMPTY)) {
+      return this;
+    }
     if (!other.currency.equals(currency)) {
       throw new IllegalArgumentException("Can not add money in different currencies : "
           + this.currency
@@ -73,7 +82,19 @@ public class Money {;
     return currency.format(amount);
   }
 
+  /**
+   * Substract the given amount of money from this money instance.
+   *
+   * @param other the money instance to substract
+   * @return a new money instance representing the result of the operation
+   */
   public Money minus(Money other) {
+    if (this.equals(EMPTY)) {
+      return other;
+    }
+    if (other.equals(EMPTY)) {
+      return this;
+    }
     if (!currency.equals(other.getCurrency())) {
       throw new IllegalArgumentException("Can not add money in different currencies : "
           + this.currency

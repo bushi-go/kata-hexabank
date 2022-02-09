@@ -102,6 +102,13 @@ public class Account {
     return balance.getCurrency();
   }
 
+  /**
+   * Withdraw the given amount from the account.
+   * If the amount provided is negative, we flip it positive before substracting.
+   *
+   * @param amount the amount to withdraw
+   * @return the account once the withdraw has been made
+   */
   public Account withdraw(Money amount) {
     if (amount.getAmount().signum() < 0) {
       amount = amount.negate();

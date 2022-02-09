@@ -1,12 +1,15 @@
 package dev.rgoussu.hexabank.cli.adapters.endpoints;
 
-import dev.rgoussu.hexabank.core.history.model.entities.AccountOperationsHistory;
+import dev.rgoussu.hexabank.core.history.model.entities.AccountSummary;
 import dev.rgoussu.hexabank.core.history.model.values.AccountOperationSummary;
 import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.history.services.AccountHistoryService;
 import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 import org.springframework.stereotype.Component;
 
+/**
+ * Driven adapter for the account history.
+ */
 @Component
 public class CliAccountHistoryAdapter implements AccountHistoryPort {
 
@@ -17,7 +20,7 @@ public class CliAccountHistoryAdapter implements AccountHistoryPort {
   }
 
   @Override
-  public AccountOperationsHistory getAccountHistory(String accountId)
+  public AccountSummary getAccountHistory(String accountId)
       throws NoSuchAccountException {
     return accountHistoryService.getAccountOperationSummary(accountId);
   }

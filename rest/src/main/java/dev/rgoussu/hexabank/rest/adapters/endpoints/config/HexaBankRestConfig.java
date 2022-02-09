@@ -2,11 +2,13 @@ package dev.rgoussu.hexabank.rest.adapters.endpoints.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import dev.rgoussu.hexabank.core.AccountServicesFactory;
+import dev.rgoussu.hexabank.core.history.ports.driven.AccountHistoryPersistencePort;
+import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
+import dev.rgoussu.hexabank.core.history.services.AccountHistoryService;
 import dev.rgoussu.hexabank.core.operations.ports.driven.AccountPersistencePort;
 import dev.rgoussu.hexabank.core.operations.ports.driven.ExchangeRateProviderPort;
-import dev.rgoussu.hexabank.core.history.ports.driving.AccountHistoryPort;
 import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
-import dev.rgoussu.hexabank.core.AccountServicesFactory;
 import dev.rgoussu.hexabank.rest.adapters.endpoints.model.serializer.MoneySerializer;
 import java.time.format.DateTimeFormatter;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -30,7 +32,7 @@ public class HexaBankRestConfig {
   /**
    * Bean for the account operation service.
    *
-   * @param accountHistoryPort account operations history management port
+   * @param accountHistoryPort       account operations history management port
    * @param exchangeRateProviderPort exchange rate provider driven port
    * @param accountPersistencePort   account persistence driven port
    * @return properly wired up account operations service
@@ -42,6 +44,21 @@ public class HexaBankRestConfig {
       AccountPersistencePort accountPersistencePort) {
     return AccountServicesFactory.INSTANCE.getOperationService(accountHistoryPort,
         exchangeRateProviderPort, accountPersistencePort);
+  }
+
+  /**
+   * Account history service.
+   *
+   * @param accountPersistencePort        persistence port for accounts
+   * @param accountHistoryPersistencePort persistence port for account history
+   * @return properly wired up account history service
+   */
+  @Bean
+  public AccountHistoryService accountHistoryService(
+      AccountPersistencePort accountPersistencePort,
+      AccountHistoryPersistencePort accountHistoryPersistencePort) {
+    return AccountServicesFactory.INSTANCE.getAccountHistoryService(accountPersistencePort,
+        accountHistoryPersistencePort);
   }
 
   /**

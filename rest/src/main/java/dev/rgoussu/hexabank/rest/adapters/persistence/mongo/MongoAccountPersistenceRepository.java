@@ -1,4 +1,4 @@
-package dev.rgoussu.hexabank.rest.adapters.persistence;
+package dev.rgoussu.hexabank.rest.adapters.persistence.mongo;
 
 import dev.rgoussu.hexabank.rest.adapters.persistence.model.AccountRecord;
 import org.springframework.data.mongodb.repository.MongoRepository;

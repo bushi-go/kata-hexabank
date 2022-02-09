@@ -6,7 +6,6 @@ import dev.rgoussu.hexabank.cli.adapters.persistence.config.AccountCsvStoreConfi
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
-import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -65,9 +64,9 @@ public class HexaBankCliApplication implements CommandLineRunner {
       while (!menu.shouldExit()) {
         menu.display(scanner);
       }
-    }catch(Exception e){
+    } catch (Exception e) {
       log.error("AN error occured during execution", e);
-    }finally {
+    } finally {
       shutdownApplication();
     }
   }
@@ -78,9 +77,9 @@ public class HexaBankCliApplication implements CommandLineRunner {
       for (FileAccountStore store : fileAccountStore) {
         store.saveToFile();
       }
-    }catch(IOException e){
+    } catch (IOException e) {
       log.error("Could not save account data !");
-      SpringApplication.exit(context, ()->2);
+      SpringApplication.exit(context, () -> 2);
     }
   }
 
@@ -89,7 +88,7 @@ public class HexaBankCliApplication implements CommandLineRunner {
       for (FileAccountStore store : fileAccountStore) {
         store.readFromFile();
       }
-      SpringApplication.exit(context, ()->0);
+      SpringApplication.exit(context, () -> 0);
     } catch (IOException e) {
       log.error("Could not initialize account data from store, shutting down");
       SpringApplication.exit(context, () -> 1);

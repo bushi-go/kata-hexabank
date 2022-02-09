@@ -31,15 +31,15 @@ public enum Currency {
   VED, VES, VND, VUV,
   WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XOF, XPD, XPF, XPT, XSU, XTS, XUA, XXX,
   YER,
-  ZAR, ZMW, ZWL;
+  ZAR, ZMW, ZWL, UNSPECIFIED;
 
   private static final String UNSPECIFIED_CURRENCY = "¤";
 
   /**
    * Get the symbol for the currency, or the unspecified currency symbol ("¤")
-   * if none was found via the java currency API
+   * if none was found via the java currency API.
    *
-   * s@return the symbol for the currency
+   * @return the symbol for the currency
    */
   public String getSymbol() {
     try {
@@ -49,13 +49,19 @@ public enum Currency {
     }
   }
 
-  public String format(Number amount){
+  /**
+   * Format the given amount to this currency representation.
+   *
+   * @param amount the amount to format
+   * @return a string representation of the amount of this currency
+   */
+  public String format(Number amount) {
     try {
       NumberFormat format = NumberFormat.getCurrencyInstance();
       format.setCurrency(java.util.Currency.getInstance(this.name()));
       return format.format(amount);
-    }catch(UnsupportedOperationException e){
-      return new DecimalFormat("#.###.00").format(amount) + " "+getSymbol();
+    } catch (UnsupportedOperationException e) {
+      return new DecimalFormat("#.###.00").format(amount) + " " + getSymbol();
     }
   }
 }

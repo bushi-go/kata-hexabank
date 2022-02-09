@@ -14,7 +14,7 @@ import dev.rgoussu.hexabank.core.operations.model.types.OperationError;
 import dev.rgoussu.hexabank.core.operations.model.types.OperationStatus;
 import dev.rgoussu.hexabank.core.operations.model.values.Money;
 import dev.rgoussu.hexabank.core.operations.services.AccountOperationService;
-import dev.rgoussu.hexabank.rest.adapters.persistence.MongoAccountPersistenceRepository;
+import dev.rgoussu.hexabank.rest.adapters.persistence.mongo.MongoAccountPersistenceRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.util.UUID;
@@ -38,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 @TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true",
     "server.servlet.context-path=/api"})
 @EnableAutoConfiguration(exclude = MongoAutoConfiguration.class)
-@Import(AccountOperationRestAdapter.class)
+@Import(AccountRestAdapter.class)
 public class AccountOperationRestAdapterTest {
 
   @MockBean

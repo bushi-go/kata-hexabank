@@ -17,6 +17,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Csv based representation of an account operation summary.
+ */
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
@@ -30,10 +33,15 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
   private static final String CURRENCY_AMOUNT_HEADER = "CURRENCY_AMOUNT";
   private static final String BALANCE_HEADER = "BALANCE";
   private static final String CURRENCY_BALANCE_HEADER = "CURRENCY_BALANCE";
-  private static final String[] HEADERS =
-      {ACCOUNT_ID_HEADER, DATE_HEADER, TYPE_HEADER, STATUS_HEADER, AMOUNT_HEADER,
-          CURRENCY_AMOUNT_HEADER,
-          BALANCE_HEADER, CURRENCY_BALANCE_HEADER};
+  private static final String[] HEADERS = {
+      ACCOUNT_ID_HEADER,
+      DATE_HEADER,
+      TYPE_HEADER,
+      STATUS_HEADER,
+      AMOUNT_HEADER,
+      CURRENCY_AMOUNT_HEADER,
+      BALANCE_HEADER,
+      CURRENCY_BALANCE_HEADER};
   private static final String DEFAULT_DELIMITER = ",";
   private final String accountId;
   private final Instant date;
@@ -82,8 +90,8 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
   }
 
   /**
-   * Read an Account record from a csv line, with the given delimiter and in the order dictated
-   * by the header line.
+   * Read an Account operation summary record from a csv line, with the given delimiter
+   * and in the order dictated by the header line.
    *
    * @param csvLine    the line to be read
    * @param delimiter  the delimiter used
@@ -119,8 +127,16 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
     }
   }
 
-  public static CsvAccountOperationRecord fromOperationSummary(String accountId,
-                                                               AccountOperationSummary operationSummary) {
+  /**
+   * Method factory to build a record from an account operation summary.
+   *
+   * @param accountId the account id
+   * @param operationSummary the operation summary
+   * @return an instance of this csv representation
+   */
+  public static CsvAccountOperationRecord fromOperationSummary(
+      String accountId,
+      AccountOperationSummary operationSummary) {
     return CsvAccountOperationRecord.builder().accountId(accountId)
         .date(operationSummary.getOperationDate())
         .operationType(operationSummary.getOperationType())
@@ -130,6 +146,13 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
         .build();
   }
 
+  /**
+   * Convert this java representation into a csv string.
+   *
+   * @param delimiter the delimiter to be used
+   * @param headerLine the header line for the target csv file
+   * @return the corresponding csv line
+   */
   public String toCsv(String delimiter, String headerLine) {
     return Stream.of(headerLine.split("[" + delimiter + "]")).map(header -> switch (header) {
       case ACCOUNT_ID_HEADER -> accountId;
@@ -144,6 +167,11 @@ public class CsvAccountOperationRecord implements Comparable<CsvAccountOperation
     }).filter(Objects::nonNull).collect(Collectors.joining(delimiter));
   }
 
+  /**
+   * Mapping method to turn this representation into its business representation.
+   *
+   * @return the business representation of this record
+   */
   public AccountOperationSummary toSummary() {
     return AccountOperationSummary.builder()
         .operationDate(date)

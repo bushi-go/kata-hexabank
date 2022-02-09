@@ -164,17 +164,21 @@ public class AccountOperationServicesTest {
         .registerOperationToHistory(Mockito.eq(accountId), argument.capture());
     assertAll(
         () -> assertEquals(deposit, argument.getValue().getOperationAmount()),
-        () -> assertEquals(targetAccount.getBalance(), argument.getValue().getBalanceAfterOperation()),
+        () -> assertEquals(targetAccount.getBalance(),
+            argument.getValue().getBalanceAfterOperation()),
         () -> assertEquals(OperationStatus.FAILURE, argument.getValue().getOperationStatus()),
-        () -> assertEquals(OperationError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY, argument.getValue().getOperationError()),
+        () -> assertEquals(OperationError.COULD_NOT_CONVERT_TO_ACCOUNT_CURRENCY,
+            argument.getValue().getOperationError()),
         () -> assertEquals(OperationType.DEPOSIT, argument.getValue().getOperationType()),
         () -> assertNotNull(argument.getValue().getOperationDate())
     );
   }
+
   @Test
   public void givenAccountNonExistingShouldNotRecord() {
     Account targetAccount = Account.create(accountId);
-    Mockito.when(persistencePort.findByAccountId(accountId)).thenThrow(new NoSuchAccountException(accountId));
+    Mockito.when(persistencePort.findByAccountId(accountId))
+        .thenThrow(new NoSuchAccountException(accountId));
     Money deposit = Money.get(30, Currency.USD);
     underTest.processDeposit(accountId, deposit);
     ArgumentCaptor<AccountOperationSummary> argument =
