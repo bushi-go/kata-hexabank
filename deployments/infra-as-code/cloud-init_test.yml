@@ -1,0 +1,55 @@
+#cloud-config k8s node
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+
+# Let iptables see bridged traffic
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+write_files:
+  - path: /etc/modules-load.d/k8s.conf
+    content: |
+      br_netfilter  
+
+  - path: /etc/sysctl.d/k8s.conf
+    content: |
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+  - path: /etc/docker/daemon.json
+    content: |
+      { 
+        "exec-opts": ["native.cgroupdriver=systemd"]
+      }
+# create the docker group
+groups:
+  - docker
+
+users:
+ - default
+ - name: kadmin
+   sudo: ALL=(ALL) NOPASSWD:ALL
+   groups:
+    - docker
+   lock_passwd: True
+   ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAEAQDYN5jkPGpwr1ONrabMTrkWFThOoOGzWsWfZIoHCb8K+4JDdSbiOOiyKs2t2rUJMhYoFImFt1QC9JSjQkXSPqQHWrxthh3qZBrWoQmjh12YNMcd0alI5zGBOY5vxSFsvM0EGRV1BE1gSF0MvUglrKdwinA7kjpy9nUCQc+xcNuWLXY7YKJGcdkjNnq87My4KgSz1jhiU0eP6Y9qFpvIrwvWQPjU40YBij3Et2j6ZSOhjLCP6x81GrVV0qq4B8NkQRzCBsIWaNw/bs9ht5cUqJsj3JeRI+NeIsR/y91OsC1ShaH0+v6q6n9BOW3IWCpIesYk0VJ/doe+DumMMbwKbc6PYwswyY9qITb3N5WWQMGfFKpfIrDZsY+/kTn1Jzq5y98ePFxAIu2yQ/IC5G9gINTFAqDIg1s43U6OILTtG8FhgCiLe6E5ah0rXrYJh2NslLY4kgPXXt9bGugdzRsBX8etNp8s/8jF3cO64hzHgBZsogWRAqsLPuMWDMKmdWestu7/GgvPb3Oxaafbd1+nUe7NrkJCkpq1lILOgfjU7t+NsRwhaxZIfWpQ8VomHuTVrFdfh37piqff4lODCmZbMB5ByvN3ihK4vKnaqtAMgs1PUXwhip0bMejTUyL0DZuXVNSieebFHo4iRL45rz197+acjVkwLp4ooNWHZuyu2lVE7lwKPiMVmg0KsOFU5mpQDEVQnbpDKe44P72E5I77Gsa/M8RJ3prTuFfKzIgcbhrEfkbPHdQfpe+WLXe5q6Er2FkZKCQyfTlpYm11IprfHnFmvchMt5Ppg6c2cPHYiE+CKnHm8SOaJl+BjVkNxFZH1f3B35HeZKY59kI4oFsm17q+LRHM4GniQhcEnQ8ogDnox2ykirxR42tMo7PEX98DmRDzhOE3fReaaB+Fpx4C7uzfiKAXV/hTvqK/DlU6c9o2pe5z1r5jXyTodtC/jI0IKXM+KlwoVTqTvbc63H1vDE228VzTn6JsQSKgGfZ7P20jR8u1q74qX2Hq6/nvIvCffq7fzYb2EKembBCDsaRlgb6/jasSBcWHAr36D3ih9P0OVbk8JPUKtpiYLDT5sVODMm5MP0eIHIDtGAO9Ul+IxEstGxNINvYofJTgoatdxVwPMngzzCditfREPEWCVKiUUGFM8tv6PwR5uzqU3J+Jh/+E/bu5GEkbtGYOyuFMAsLKrlEpBif2SCsjDfvv8JyF+/Y+rfWYfCVKJMlmOv3xoKpZJHjoATlQHYO3XfrY4dQwFCpPHykUJyo2B0JWm/mqsfHdMo8RaBpyuy/wQGePvqCtVKqoUi6cbLv1ZZ011NOLiWQNGpVy9ZgeVjjrQEOJNgcAT+8Ei5klow79FP9Try7F ansible-generated on rgoussu-dev
+
+runcmd:
+  - modprobe br_netfilter # Load br_netfilter module.
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg # Add Docker’s official GPG key
+  - curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg # Download the Google Cloud public signing key:
+  - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null # set up the stable repository
+  - echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list # Add the Kubernetes apt repository
+  - apt-get update -y # Update apt package index
+  - apt-get install -y docker-ce docker-ce-cli containerd.io kubelet kubeadm kubectl # Install Docker Engine, kubelet, kubeadm and kubectl
+  - apt-mark hold kubelet kubeadm kubectl # pin kubelet kubeadm kubectl version
+  - sysctl --system # Reload settings from all.yml system configuration files to take iptables configuration
+  - swapoff -a
+  - sed -i '/ swap / s/^/#/' /etc/fstab
+  - systemctl restart docker

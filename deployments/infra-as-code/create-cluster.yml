@@ -1,0 +1,12 @@
+---
+- name: Create VMs for {{ target_env }} cluster via multipass
+  hosts: vm_hosts
+  tasks:
+    - name: Provision VMS through multipass
+      vars:
+        vms: "{{groups['cluster_vm']}}"
+      include_role:
+        name: mutlipass-provision-vm
+  tags:
+    - multipass
+    - provision

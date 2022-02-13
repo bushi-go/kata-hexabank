@@ -1,0 +1,8 @@
+target_cloud: "local"
+target_env: "test"
+service_cidr: "10.224.240.0/24"
+kube_version:
+pod_network_cidr: "10.224.248.0/24"
+container_runtime:
+kubeadm_opts:
+init_opts:

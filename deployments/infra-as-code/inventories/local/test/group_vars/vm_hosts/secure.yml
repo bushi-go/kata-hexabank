@@ -1,0 +1,1 @@
+# passwords generated using   < /dev/urandom tr -cd '[:graph:]'| tr  -d '\\' | tr -d '\"' | tr -d '\`' | head -c 32; echo

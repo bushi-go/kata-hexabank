@@ -1,0 +1,69 @@
+---
+- name: creating tmp directory for cloud init files
+  file:
+    path: /tmp/{{target_env}}
+    state: directory
+
+- name: Delete existing key pair and cloud-init file
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "~/.ssh/ansible_{{ target_cloud }}_{{ target_env }}"
+    - "~/.ssh/ansible_{{ target_cloud }}_{{ target_env }}.pub"
+    - "{{'cloud-init_'+target_env+'.yml'}}"
+
+- name: Generate new key pair
+  user:
+    name: "{{ansible_user}}"
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_bits: 8192
+    ssh_key_file: ".ssh/ansible_{{ target_cloud }}_{{ target_env }}"
+
+- name: generate cloud-init-file
+  template:
+    src: cloud-init-template.yml.j2
+    dest: "{{'cloud-init_'+target_env+'.yml'}}"
+  vars:
+    public_key: "{{ lookup('file', '~/.ssh/ansible_{{ target_cloud }}_{{ target_env }}.pub') }}"
+
+- name: clean up vm {{ item }} if exists
+  shell: |
+      multipass delete {{ item }} --purge
+  ignore_errors: yes
+  with_items: "{{ vms }}"
+
+
+- name: Create mutlipass vm {{ item }}
+  shell: |
+    multipass launch --name '{{ item }}' \
+          --cpus 2 \
+          --mem 2048M \
+          --disk 10G \
+          --cloud-init cloud-init_{{target_env}}.yml
+  async: 300
+  poll: 0
+  register: async_loop
+  with_items: "{{ vms }}"
+
+- name: check on status for item
+  async_status:
+    jid: "{{item.ansible_job_id}}"
+    mode: status
+  loop: "{{async_loop.results}}"
+  register: async_loop_jobs
+  until: async_loop_jobs.finished
+  retries: 10
+  delay: 30
+
+- name: check on status for item
+  async_status:
+    jid: "{{item.ansible_job_id}}"
+    mode: cleanup
+  loop: "{{async_loop.results}}"
+
+- name: clean up cloud_init files
+  file:
+    path: "{{'cloud-init_'+target_env+'.yml'}}"
+    state: absent

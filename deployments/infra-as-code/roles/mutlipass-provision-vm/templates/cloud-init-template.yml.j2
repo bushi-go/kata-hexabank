@@ -1,4 +1,4 @@
-#cloud-config master node
+#cloud-config k8s node
 
 package_update: true
 package_upgrade: true
@@ -30,10 +30,15 @@ write_files:
 groups:
   - docker
 
-# Add default auto created user to docker group
-system_info:
-  default_user:
-    groups: [docker]
+users:
+ - default
+ - name: kadmin
+   sudo: ALL=(ALL) NOPASSWD:ALL
+   groups:
+    - docker
+   lock_passwd: True
+   ssh_authorized_keys:
+    - {{ public_key }}
 
 runcmd:
   - modprobe br_netfilter # Load br_netfilter module.
@@ -44,7 +49,7 @@ runcmd:
   - apt-get update -y # Update apt package index
   - apt-get install -y docker-ce docker-ce-cli containerd.io kubelet kubeadm kubectl # Install Docker Engine, kubelet, kubeadm and kubectl
   - apt-mark hold kubelet kubeadm kubectl # pin kubelet kubeadm kubectl version
-  - sysctl --system # Reload settings from all system configuration files to take iptables configuration
+  - sysctl --system # Reload settings from all.yml system configuration files to take iptables configuration
   - swapoff -a
   - sed -i '/ swap / s/^/#/' /etc/fstab
   - systemctl restart docker

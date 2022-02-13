@@ -1,0 +1,2 @@
+# generated using   < /dev/urandom tr -cd '[:graph:]'| tr  -d '\\' | tr -d '\"' | tr -d '\`' | head -c 32; echo
+ssh_passphrase: "838jdE1Tj=[2qOvD%OP}CFu@[:&AISoM"
