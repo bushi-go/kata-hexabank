@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Slf4j
-public class AccountHistoryAdapter implements AccountHistoryPort {
+public class AccountHistoryAdapter implements AccountHistoryPort<Void> {
 
 
   private final AccountHistoryService accountHistoryService;
@@ -40,7 +40,8 @@ public class AccountHistoryAdapter implements AccountHistoryPort {
   }
 
   @Override
-  public void registerOperationToHistory(String accountId, AccountOperationSummary operation) {
+  public Void registerOperationToHistory(String accountId, AccountOperationSummary operation) {
     accountHistoryService.recordOperationToHistory(accountId, operation);
+    return null;
   }
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * Driven adapter for the account history.
  */
 @Component
-public class CliAccountHistoryAdapter implements AccountHistoryPort {
+public class CliAccountHistoryAdapter implements AccountHistoryPort<Void> {
 
   private final AccountHistoryService accountHistoryService;
 
@@ -26,7 +26,8 @@ public class CliAccountHistoryAdapter implements AccountHistoryPort {
   }
 
   @Override
-  public void registerOperationToHistory(String accountId, AccountOperationSummary operation) {
+  public Void registerOperationToHistory(String accountId, AccountOperationSummary operation) {
     accountHistoryService.recordOperationToHistory(accountId, operation);
+    return null;
   }
 }

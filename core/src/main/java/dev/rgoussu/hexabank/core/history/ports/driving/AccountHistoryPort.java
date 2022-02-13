@@ -7,7 +7,7 @@ import dev.rgoussu.hexabank.core.operations.exceptions.NoSuchAccountException;
 /**
  * Account history driving port.
  */
-public interface AccountHistoryPort {
+public interface AccountHistoryPort<T> {
   /**
    * Get the history for the given account.
    *
@@ -22,6 +22,7 @@ public interface AccountHistoryPort {
    *
    * @param accountId the id of the account
    * @param operation the operation summary
+   * @return T return value depending on implementation
    */
-  void registerOperationToHistory(String accountId, AccountOperationSummary operation);
+   T registerOperationToHistory(String accountId, AccountOperationSummary operation);
 }
